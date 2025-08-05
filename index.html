@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speak for the Streets</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- AOS for animation -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+
+  <!-- Background Section -->
+  <div class="relative bg-cover bg-center h-screen" style="background-image: url('images/Screenshot_2025-07-31_at_8.49.18_PM.png');">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black bg-opacity-60 z-0"></div>
+
+    <!-- Header -->
+    <header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-4 bg-transparent">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">📍</span>
+        <span class="text-lg font-medium">Pune, India</span>
+      </div>
+      <h1 class="text-3xl font-semibold">Speak for the Streets</h1>
+      <div class="flex items-center space-x-4">
+        <select class="bg-black bg-opacity-50 px-2 py-1 rounded border border-gray-300">
+          <option>English</option>
+          <option>हिंदी</option>
+          <option>मराठी</option>
+        </select>
+        <a href="login.html" class="underline">Sign In</a>
+        <button class="text-white text-2xl">☰</button>
+      </div>
+    </header>
+
+    <!-- Hero Text -->
+    <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4" data-aos="fade-up" data-aos-duration="1200">
+      <h2 class="text-5xl font-bold mb-4">Raise Your Voice for a Better Tomorrow</h2>
+      <p class="text-xl mb-6">Report civic issues around you – Roads, Garbage, Water, and more.</p>
+
+      <!-- Additional Line -->
+      <p class="text-lg text-white max-w-2xl mb-6">
+        From potholes to progress, transform your locality — one photo, one report, one vote. Together, let’s show our unity and make the change happen.
+      </p>
+
+      <!-- Get Started Button -->
+      <a href="signup.html">
+  <button class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-full transition duration-300">
+    Get Started
+  </button>
+</a>
+    </div>
+  </div>
+
+  <!-- AOS JS -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+
+</body>
+</html>
