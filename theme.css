@@ -1,0 +1,119 @@
+/* --------------------- Color Theme --------------------- */
+:root {
+  --primary-color: #1e88e5;
+  --primary-dark: #1565c0;
+  --accent-color: #ffca28;
+  --danger-color: #e53935;
+  --success-color: #43a047;
+  --bg-light: #f5f7fa;
+  --bg-dark: #263238;
+  --text-dark: #212121;
+  --text-light: #ffffff;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --------------------- Typography --------------------- */
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* --------------------- Buttons --------------------- */
+button, .btn {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+button:hover, .btn:hover {
+  background-color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+/* --------------------- Cards / Containers --------------------- */
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 20px 0;
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* --------------------- Navigation Bar --------------------- */
+.navbar {
+  background-color: var(--primary-dark);
+  color: var(--text-light);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar a {
+  color: var(--text-light);
+  text-decoration: none;
+  margin-left: 20px;
+}
+
+/* --------------------- Upload Status --------------------- */
+#uploadStatus {
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+/* --------------------- Vote / Comment Buttons --------------------- */
+.vote-btn, .comment-btn {
+  background-color: var(--accent-color);
+  color: var(--text-dark);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-right: 10px;
+  box-shadow: var(--shadow);
+}
+
+.vote-btn:hover {
+  background-color: #fdd835;
+}
+/* --------------------- Extra Enhancements --------------------- */
+.select-box {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fdfdfd;
+  transition: 0.3s ease;
+}
+
+.select-box:hover {
+  border-color: #888;
+  background-color: #f0f0f0;
+}
+
+.icon-btn {
+  margin: 0 5px;
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.2);
+}
