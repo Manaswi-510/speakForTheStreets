@@ -1,0 +1,227 @@
+/* Global styles */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0 20px;
+  color: #333;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode */
+body.dark-mode {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+/* Header */
+header.header,
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1a1a2e;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-top: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Left Info */
+.left-info p,
+.left-info ul li a {
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.left-info ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.left-info ul li {
+  margin-top: 5px;
+}
+
+/* Right Icons */
+.right-icons i {
+  font-size: 18px;
+  margin-left: 15px;
+  cursor: pointer;
+  color: white;
+}
+
+/* Search Box */
+#searchBox {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 14px;
+}
+
+/* Notification/User Panel */
+#notificationPanel,
+#userPanel,
+#appearancePanel {
+  position: absolute;
+  right: 20px;
+  top: 60px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ccc;
+  width: 250px;
+  z-index: 1001;
+}
+
+#appearancePanel h3 {
+  margin-top: 0;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+#appearancePanel .dark-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Form Section */
+.form-section form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input,
+textarea,
+select#langSelect {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+/* Buttons */
+.btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+/* Issues Container */
+.issue {
+  background-color: #fff;
+  padding: 12px;
+  margin: 10px 0;
+  border-left: 5px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s;
+}
+
+body.dark-mode .issue {
+  background-color: #1f1f1f;
+  border-left: 5px solid #bb86fc;
+}
+
+/* Comment and Vote Row */
+.interaction-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.comment-input {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.comment-btn {
+  padding: 8px 10px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-btn:hover {
+  background-color: #218838;
+}
+
+/* Top Left and Top Right Panels */
+.top-left,
+.top-right {
+  position: absolute;
+  padding: 10px;
+}
+
+.top-left {
+  top: 10px;
+  left: 10px;
+}
+
+.top-right {
+  top: 10px;
+  right: 10px;
+}
+
+/* Dropdown Panels */
+.dropdown {
+  display: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Reels & Notifications */
+.reels-container,
+.notifications-container {
+  margin-top: 10px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* Logout Button */
+#logoutButton {
+  margin-top: 10px;
+  background-color: #dc3545;
+  color: white;
+  padding: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#logoutButton:hover {
+  background-color: #c82333;
+}
