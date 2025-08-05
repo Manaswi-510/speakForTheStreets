@@ -1,0 +1,13 @@
+{
+  "welcome": "Welcome to Civic Reporter",
+  "desc": "Raise issues anonymously, and let your locality be heard.",
+  "start": "Start Reporting",
+  "main_title": "Report Issue",
+  "post_issue": "Post a Civic Issue",
+  "submit": "Submit",
+  "community": "Community Complaints",
+  "success_title": "Success",
+  "thanks": "Thank you!",
+  "success_msg": "Your issue has been recorded successfully.",
+  "report_more": "Report Another"
+}

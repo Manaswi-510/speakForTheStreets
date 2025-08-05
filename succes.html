@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title data-i18n="issue_submitted_title">Issue Submitted</title>
+
+  <!-- TailwindCSS & AOS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+  <!-- Custom Theme -->
+  <link rel="stylesheet" href="/static/css/theme.css">
+  <link rel="stylesheet" href="/static/css/animate.css">
+
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .language-switcher select {
+      border: none;
+      background-color: transparent;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-tr from-gray-100 to-white min-h-screen flex items-center justify-center px-4 relative">
+
+  <!-- 🌐 Language Switcher -->
+  <div class="absolute top-6 right-6 language-switcher">
+    <select id="languageSelect" onchange="changeLanguage()" class="bg-white border border-gray-300 rounded px-3 py-1 shadow">
+      <option value="en">🌐 English</option>
+      <option value="hi">🇮🇳 हिंदी</option>
+      <option value="mr">🌿 मराठी</option>
+    </select>
+  </div>
+
+  <!-- ✅ Success Card -->
+  <div class="max-w-xl w-full bg-white p-8 rounded-2xl shadow-2xl text-center" data-aos="fade-up">
+    <div class="text-green-500 text-6xl mb-4">✅</div>
+    
+    <h1 class="text-3xl font-bold text-gray-800 mb-4" data-i18n="issue_submitted_heading">
+      Issue Submitted Successfully
+    </h1>
+
+    <p class="text-gray-600 text-lg leading-relaxed" data-i18n="issue_submitted_msg">
+      Thank you for reporting this issue in your locality. Your voice matters!<br>
+      Others can now see your post, vote on it, and leave comments.<br><br>
+      Once the complaint receives <strong>10 or more votes</strong>, it will be automatically forwarded to the relevant municipal authority.
+    </p>
+
+    <div class="mt-8 flex justify-center gap-4 flex-wrap">
+      <a href="main.html" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl transition duration-300 text-lg font-medium shadow" data-i18n="view_issues">
+        🌍 View All Issues
+      </a>
+      <a href="upload.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition duration-300 text-lg font-medium shadow" data-i18n="post_another">
+        ➕ Post Another
+      </a>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>AOS.init();</script>
+  <script src="/static/js/lang.js"></script>
+</body>
+</html>
