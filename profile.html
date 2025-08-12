@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .profile-container {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+      background-color: #ddd;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      color: #888;
+    }
+
+    .profile-info input {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      padding: 8px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .posts-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .post-box {
+      width: 200px;
+      height: 250px;
+      background-color: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .post-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background-color: #1a1a2e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header-bar" style="background-color: black; color: white; padding: 10px 20px; display: flex; justify-content: space-between;">
+    <div class="left-info">
+      <p>Digital Grievance Redressal Portal</p>
+    </div>
+    <div class="right-icons">
+      <i class="fas fa-bell" title="Notifications"></i>
+      <i class="fas fa-circle-user" title="Profile"></i>
+    </div>
+  </header>
+
+  <!-- CONTAINER -->
+  <div style="display: flex; margin-top: 20px;">
+
+    <!-- SIDEBAR -->
+    <nav style="width: 220px; background: #1a1a2e; border-radius: 10px; padding: 20px; color: white; height: 100vh;">
+      <ul style="list-style: none; padding-left: 0;">
+        <a href="http://127.0.0.1:5500/main.html"><i class="fas fa-home"></i> Home</a>
+        <li><i class="fas fa-compass"></i> Explore</li>
+        <li><i class="fas fa-video"></i> Reels</li>
+        <li><i class="fas fa-bell"></i> Notifications</li>
+        <li><i class="fas fa-sign-out-alt"></i> Logout</li>
+      </ul>
+    </nav>
+
+    <!-- PROFILE SECTION -->
+    <main style="flex: 1; margin-left: 20px;">
+
+      <!-- USER INFO -->
+      <section class="profile-container">
+        <div class="profile-photo">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-info">
+          <h2>Anonymous</h2>
+          <label>Address:</label>
+          <input type="text" placeholder="Enter address" />
+
+          <label>City:</label>
+          <input type="text" placeholder="Enter city" />
+
+          <button class="btn">Save</button>
+        </div>
+      </section>
+
+      <!-- POSTS -->
+      <section style="margin-top: 30px;">
+        <h3 style="margin-bottom: 10px;">Posts & Reels</h3>
+        <div class="posts-grid">
+          <div class="post-box">
+            <img src="https://via.placeholder.com/200x250" alt="Post" />
+          </div>
+          <div class="post-box">
+            <img src="https://via.placeholder.com/200x250" alt="Post" />
+          </div>
+          <div class="post-box">
+            <img src="https://via.placeholder.com/200x250" alt="Post" />
+          </div>
+          <!-- Add more if needed -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>
