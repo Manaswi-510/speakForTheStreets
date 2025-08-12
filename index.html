@@ -10,6 +10,51 @@
 
   <!-- AOS for animation -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <style>
+    /* Sliding Animation */
+    @keyframes slide {
+      0% { transform: translateX(0%); }
+      20% { transform: translateX(0%); }
+      25% { transform: translateX(-25%); }
+      45% { transform: translateX(-25%); }
+      50% { transform: translateX(-50%); }
+      70% { transform: translateX(-50%); }
+      75% { transform: translateX(-75%); }
+      95% { transform: translateX(-75%); }
+      100% { transform: translateX(0%); }
+    }
+    .animate-slide {
+      animation: slide 16s infinite;
+      transition: transform 1s ease-in-out;
+    }
+
+    /* Neon purple border glow */
+    .purple-glow {
+      border: 4px solid #a855f7;
+      box-shadow: 0 0 15px #a855f7;
+    }
+
+    /* Image hover zoom */
+    .image-zoom {
+      transition: transform 0.6s ease;
+    }
+    .image-zoom:hover {
+      transform: scale(1.05);
+    }
+
+    /* Text overlay on image */
+    .text-overlay {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      color: white;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+  </style>
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -24,7 +69,7 @@
         <span class="text-xl">📍</span>
         <span class="text-lg font-medium">Pune, India</span>
       </div>
-      <h1 class="text-3xl font-semibold">Speak for the Streets</h1>
+      <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Speak for the Streets</h1>
       <div class="flex items-center space-x-4">
         <select class="bg-black bg-opacity-50 px-2 py-1 rounded border border-gray-300">
           <option>English</option>
@@ -40,26 +85,74 @@
     <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4" data-aos="fade-up" data-aos-duration="1200">
       <h2 class="text-5xl font-bold mb-4">Raise Your Voice for a Better Tomorrow</h2>
       <p class="text-xl mb-6">Report civic issues around you – Roads, Garbage, Water, and more.</p>
-
-      <!-- Additional Line -->
       <p class="text-lg text-white max-w-2xl mb-6">
-        From potholes to progress, transform your locality — one photo, one report, one vote. Together, let’s show our unity and make the change happen.
+        From potholes to progress, transform your locality — one photo, one report and one vote. Together, let’s show our unity and make the change happen.
       </p>
-
-      <!-- Get Started Button -->
       <a href="signup.html">
-  <button class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-full transition duration-300">
-    Get Started
-  </button>
-</a>
+        <button class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-full transition duration-300">
+          Get Started
+        </button>
+      </a>
     </div>
   </div>
+
+  <!-- Second Section: Image Slider -->
+<section class="h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-gray-900">
+  
+  <!-- Title above slider -->
+  
+
+  <!-- Slider container -->
+  <div class="w-3/4 h-3/4 overflow-hidden purple-glow rounded-lg bg-black">
+    <div class="flex w-[400%] h-full animate-slide">
+    
+
+  <!-- AOS for animation -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+      <!-- 1st Image -->
+      <div class="relative w-1/4 purple-glow">
+        <img src="https://images.hindustantimes.com/img/2021/07/28/550x309/b5787e3a-ef91-11eb-8e1b-864212280c54_1627469670796.jpg" 
+             class="w-full h-full object-cover image-zoom" alt="Bad Road">
+        <div class="text-overlay">Potholes today. Lives at risk tomorrow. Upvote now—force action.</div>
+      </div>
+
+      <!-- 2nd Image -->
+      <div class="relative w-1/4 purple-glow">
+        <img src="https://substackcdn.com/image/fetch/$s_!092G!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F3f4e6030-5cee-4652-807e-d3c38e6d7a90_806x419.jpeg" 
+             class="w-full h-full object-cover image-zoom" alt="Potholes Road">
+        <div class="text-overlay">Potholes can’t speak. You can. Upvote and be heard.</div>
+      </div>
+
+      <!-- 3rd Image -->
+      <div class="relative w-1/4 purple-glow">
+        <img src="https://c8.alamy.com/comp/HE8A7M/gyantse-canal-with-garbage-tibet-china-HE8A7M.jpg" 
+             class="w-full h-full object-cover image-zoom" alt="Garbage Canal">
+        <div class="text-overlay">Trash in water, poison in life.</div>
+      </div>
+
+      <!-- 4th Image -->
+      <div class="relative w-1/4 purple-glow">
+        <img src="https://static.toiimg.com/thumb/msid-59420958,width-1280,height-720,resizemode-72/59420958.jpg" 
+             class="w-full h-full object-cover image-zoom" alt="Highway Damage">
+        <div class="text-overlay">Water is life, not a dustbin.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CTA button -->
+  <a href="main.html">
+  <button class="mt-6 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-full transition duration-300 animate-pulse">
+    Upvote Now
+  </a>
+  </button>
+
+</section>
 
   <!-- AOS JS -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
   </script>
-
 </body>
 </html>
