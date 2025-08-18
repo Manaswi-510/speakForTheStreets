@@ -67,29 +67,29 @@
     <header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-4 bg-transparent">
       <div class="flex items-center space-x-2">
         <span class="text-xl">📍</span>
-        <span class="text-lg font-medium">Pune, India</span>
+        <span id="location" class="text-lg font-medium">Pune, India</span>
       </div>
-      <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Speak for the Streets</h1>
+      <h1 id="site_title" class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Speak for the Streets</h1>
       <div class="flex items-center space-x-4">
-        <select class="bg-black bg-opacity-50 px-2 py-1 rounded border border-gray-300">
-          <option>English</option>
-          <option>हिंदी</option>
-          <option>मराठी</option>
+        <select id="languageSelector" class="bg-black bg-opacity-50 px-2 py-1 rounded border border-gray-300">
+          <option value="en">English</option>
+          <option value="hi">हिंदी</option>
+          <option value="mr">मराठी</option>
         </select>
-        <a href="login.html" class="underline">Sign In</a>
+        <a id="sign_in" href="signin.html" class="underline">Sign In</a>
         <button class="text-white text-2xl">☰</button>
       </div>
     </header>
 
     <!-- Hero Text -->
     <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4" data-aos="fade-up" data-aos-duration="1200">
-      <h2 class="text-5xl font-bold mb-4">Raise Your Voice for a Better Tomorrow</h2>
-      <p class="text-xl mb-6">Report civic issues around you – Roads, Garbage, Water, and more.</p>
-      <p class="text-lg text-white max-w-2xl mb-6">
+      <h2 id="raise_voice" class="text-5xl font-bold mb-4">Raise Your Voice for a Better Tomorrow</h2>
+      <p id="report_desc" class="text-xl mb-6">Report civic issues around you – Roads, Garbage, Water, and more.</p>
+      <p id="report_extra" class="text-lg text-white max-w-2xl mb-6">
         From potholes to progress, transform your locality — one photo, one report and one vote. Together, let’s show our unity and make the change happen.
       </p>
       <a href="signup.html">
-        <button class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-full transition duration-300">
+        <button id="get_started" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-full transition duration-300">
           Get Started
         </button>
       </a>
@@ -97,62 +97,101 @@
   </div>
 
   <!-- Second Section: Image Slider -->
-<section class="h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-gray-900">
-  
-  <!-- Title above slider -->
-  
-
-  <!-- Slider container -->
-  <div class="w-3/4 h-3/4 overflow-hidden purple-glow rounded-lg bg-black">
-    <div class="flex w-[400%] h-full animate-slide">
-    
-
-  <!-- AOS for animation -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-      <!-- 1st Image -->
-      <div class="relative w-1/4 purple-glow">
-        <img src="https://images.hindustantimes.com/img/2021/07/28/550x309/b5787e3a-ef91-11eb-8e1b-864212280c54_1627469670796.jpg" 
-             class="w-full h-full object-cover image-zoom" alt="Bad Road">
-        <div class="text-overlay">Potholes today. Lives at risk tomorrow. Upvote now—force action.</div>
+  <section class="h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-gray-900">
+    <div class="w-3/4 h-3/4 overflow-hidden purple-glow rounded-lg bg-black">
+      <div class="flex w-[400%] h-full animate-slide">
+        <!-- 1st Image -->
+        <div class="relative w-1/4 purple-glow">
+          <img src="https://images.hindustantimes.com/img/2021/07/28/550x309/b5787e3a-ef91-11eb-8e1b-864212280c54_1627469670796.jpg" class="w-full h-full object-cover image-zoom" alt="Bad Road">
+          <div id="slider1" class="text-overlay">Potholes today. Lives at risk tomorrow. Upvote now—force action.</div>
+        </div>
+        <!-- 2nd Image -->
+        <div class="relative w-1/4 purple-glow">
+          <img src="https://substackcdn.com/image/fetch/$s_!092G!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F3f4e6030-5cee-4652-807e-d3c38e6d7a90_806x419.jpeg" class="w-full h-full object-cover image-zoom" alt="Potholes Road">
+          <div id="slider2" class="text-overlay">Potholes can’t speak. You can. Upvote and be heard.</div>
+        </div>
+        <!-- 3rd Image -->
+        <div class="relative w-1/4 purple-glow">
+          <img src="https://c8.alamy.com/comp/HE8A7M/gyantse-canal-with-garbage-tibet-china-HE8A7M.jpg" class="w-full h-full object-cover image-zoom" alt="Garbage Canal">
+          <div id="slider3" class="text-overlay">Trash in water, poison in life.</div>
+        </div>
+        <!-- 4th Image -->
+        <div class="relative w-1/4 purple-glow">
+          <img src="https://static.toiimg.com/thumb/msid-59420958,width-1280,height-720,resizemode-72/59420958.jpg" class="w-full h-full object-cover image-zoom" alt="Highway Damage">
+          <div id="slider4" class="text-overlay">Water is life, not a dustbin.</div>
+        </div>
       </div>
-
-      <!-- 2nd Image -->
-      <div class="relative w-1/4 purple-glow">
-        <img src="https://substackcdn.com/image/fetch/$s_!092G!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F3f4e6030-5cee-4652-807e-d3c38e6d7a90_806x419.jpeg" 
-             class="w-full h-full object-cover image-zoom" alt="Potholes Road">
-        <div class="text-overlay">Potholes can’t speak. You can. Upvote and be heard.</div>
-      </div>
-
-      <!-- 3rd Image -->
-      <div class="relative w-1/4 purple-glow">
-        <img src="https://c8.alamy.com/comp/HE8A7M/gyantse-canal-with-garbage-tibet-china-HE8A7M.jpg" 
-             class="w-full h-full object-cover image-zoom" alt="Garbage Canal">
-        <div class="text-overlay">Trash in water, poison in life.</div>
-      </div>
-
-      <!-- 4th Image -->
-      <div class="relative w-1/4 purple-glow">
-        <img src="https://static.toiimg.com/thumb/msid-59420958,width-1280,height-720,resizemode-72/59420958.jpg" 
-             class="w-full h-full object-cover image-zoom" alt="Highway Damage">
-        <div class="text-overlay">Water is life, not a dustbin.</div>
-      </div>
-
     </div>
-  </div>
 
-  <!-- CTA button -->
-  <a href="main.html">
-  <button class="mt-6 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-full transition duration-300 animate-pulse">
-    Upvote Now
-  </a>
-  </button>
+    <!-- ✅ Fixed CTA button -->
+    <button id="upvote_now" class="mt-6 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-full transition duration-300 animate-pulse">
+      Upvote Now
+    </button>
+  </section>
 
-</section>
-
-  <!-- AOS JS -->
+  <!-- AOS + Logic -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
+
+    const elementsToTranslate = [
+      "site_title","location","sign_in","raise_voice","report_desc","report_extra",
+      "get_started","slider1","slider2","slider3","slider4","upvote_now"
+    ];
+
+    // Embedded translations
+    const translations = {
+      en: { site_title: "Speak for the Streets", location: "Pune, India", sign_in: "Sign In",
+        raise_voice: "Raise Your Voice for a Better Tomorrow",
+        report_desc: "Report civic issues around you – Roads, Garbage, Water, and more.",
+        report_extra: "From potholes to progress, transform your locality — one photo, one report and one vote. Together, let’s show our unity and make the change happen.",
+        get_started: "Get Started", slider1: "Potholes today. Lives at risk tomorrow. Upvote now—force action.",
+        slider2: "Potholes can’t speak. You can. Upvote and be heard.",
+        slider3: "Trash in water, poison in life.", slider4: "Water is life, not a dustbin.", upvote_now: "Upvote Now" },
+      hi: { site_title: "सड़कों के लिए बोलें", location: "पुणे, भारत", sign_in: "साइन इन",
+        raise_voice: "बेहतर कल के लिए अपनी आवाज उठाएँ",
+        report_desc: "अपने आसपास की नागरिक समस्याओं की रिपोर्ट करें – सड़कें, कचरा, पानी और अधिक।",
+        report_extra: "गड्ढों से प्रगति तक, अपने इलाके को बदलें — एक फोटो, एक रिपोर्ट और एक वोट। मिलकर, आइए अपनी एकता दिखाएँ और बदलाव लाएँ।",
+        get_started: "शुरू करें", slider1: "आज गड्ढे, कल जान खतरे में। अभी वोट करें—कार्रवाई करवाएँ।",
+        slider2: "गड्ढे बोल नहीं सकते। आप बोल सकते हैं। वोट करें और अपनी बात रखें।",
+        slider3: "पानी में कचरा, जीवन में ज़हर।", slider4: "पानी जीवन है, कूड़ादान नहीं।", upvote_now: "अभी वोट करें" },
+      mr: { site_title: "रस्त्यांसाठी बोला", location: "पुणे, भारत", sign_in: "साइन इन",
+        raise_voice: "चांगल्या उद्यासाठी आपला आवाज उठवा",
+        report_desc: "आपल्या आसपासच्या नागरी समस्या नोंदवा – रस्ते, कचरा, पाणी आणि इतर.",
+        report_extra: "खड्ड्यांपासून प्रगतीपर्यंत, आपल्या भागाचा बदल करा — एक फोटो, एक रिपोर्ट आणि एक मत. चला, एकत्र येऊ आणि बदल घडवू.",
+        get_started: "सुरू करा", slider1: "आज खड्डे, उद्या जीव धोक्यात. आत्ताच मत द्या—कारवाई घडवा.",
+        slider2: "खड्डे बोलत नाहीत. तुम्ही बोलू शकता. मत द्या आणि आपला आवाज द्या.",
+        slider3: "पाण्यात कचरा, जीवनात विष.", slider4: "पाणी म्हणजे जीवन, कचरापेटी नाही.", upvote_now: "आत्ताच मत द्या" }
+    };
+
+    function loadLanguage(lang) {
+      elementsToTranslate.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && translations[lang][id]) {
+          el.textContent = translations[lang][id];
+        }
+      });
+    }
+
+    document.getElementById("languageSelector").addEventListener("change", (e) => {
+      loadLanguage(e.target.value);
+    });
+
+    // Load default English
+    loadLanguage("en");
+
+    // ✅ Upvote button login check
+    function isUserLoggedIn() {
+      return localStorage.getItem("isLoggedIn") === "true";
+    }
+
+    document.getElementById("upvote_now").addEventListener("click", function () {
+      if (isUserLoggedIn()) {
+        window.location.href = "main.html";
+      } else {
+        window.location.href = "signup.html";
+      }
+    });
   </script>
 </body>
 </html>
