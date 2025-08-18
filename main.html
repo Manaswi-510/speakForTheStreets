@@ -39,17 +39,26 @@
       z-index: 1000;
     }
 
-    .location, .title, .menu-toggle {
+    .location, .title {
       flex: 1;
-      text-align: center;
     }
 
     .location {
       text-align: left;
     }
 
+    .title {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
     .menu-toggle {
-      text-align: right;
       cursor: pointer;
     }
 
@@ -127,42 +136,61 @@
       justify-content: space-between;
       align-items: center;
     }
+
+    /* Language Switcher */
+    .language-switcher select {
+      background: #000;
+      color: white;
+      border: 1px solid #444;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="location">📍 Pune</div>
-    <div class="title">Speak for the Streets</div>
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="location" id="locationText">📍 Pune</div>
+    <div class="title" id="mainTitle">Speak for the Streets</div>
+    <div class="header-right">
+      <!-- 🌐 Language Switcher -->
+      <div class="language-switcher">
+        <select id="langSelect" onchange="setLanguage(this.value)">
+          <option value="en">🌐 English</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="mr">🌿 मराठी</option>
+        </select>
+      </div>
+      <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    </div>
   </header>
 
   <div class="sidebar">
-    <a href="http://127.0.0.1:5500/main.html"><i class="fas fa-home"></i> Home</a>
-    <a href="#"><i class="fas fa-search"></i> Search</a>
-    <a href="#"><i class="fas fa-video"></i> Reels</a>
-    <a href="#"><i class="fas fa-envelope"></i> Messages</a>
-    <a href="#"><i class="fas fa-bell"></i> Notification</a>
-    <a href="#"><i class="fas fa-plus"></i> Create</a>
-    <a href="http://127.0.0.1:5500/uploads/profile.html"><i class="fas fa-user"></i> Profile</a>  
-    <a href="#" onclick="showAppearancePopup()"><i class="fas fa-adjust"></i> Switch Appearance</a>                                                                                                                                                                                                                                                    
-    <a href="#"><i class="fas fa-cog"></i> Settings</a>
-    <a href="#"><i class="fas fa-list"></i> Your Activity</a>
-    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+    <a href="main.html"><i class="fas fa-home"></i> <span id="navHome">Home</span></a>
+    <a href="#"><i class="fas fa-search"></i> <span id="navSearch">Search</span></a>
+    <a href="#"><i class="fas fa-video"></i> <span id="navReels">Reels</span></a>
+    <a href="#"><i class="fas fa-envelope"></i> <span id="navMessages">Messages</span></a>
+    <a href="#"><i class="fas fa-bell"></i> <span id="navNotifications">Notification</span></a>
+    <a href="#"><i class="fas fa-plus"></i> <span id="navCreate">Create</span></a>
+    <a href="uploads/profile.html"><i class="fas fa-user"></i> <span id="navProfile">Profile</span></a>
+    <a href="#" onclick="showAppearancePopup()"><i class="fas fa-adjust"></i> <span id="navAppearance">Switch Appearance</span></a>                                                                                                                                                                                                                                                    
+    <a href="#"><i class="fas fa-cog"></i> <span id="navSettings">Settings</span></a>
+    <a href="#"><i class="fas fa-list"></i> <span id="navActivity">Your Activity</span></a>
+    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="navLogout">Log Out</span></a>
   </div>
 
   <div class="appearance-popup" id="appearance-popup">
-    <strong>Switch Appearance</strong>
+    <strong id="appearanceTitle">Switch Appearance</strong>
     <div class="dark-mode-toggle">
-      <span>Dark Mode</span>
+      <span id="darkModeLabel">Dark Mode</span>
       <input type="checkbox" id="darkToggle" onclick="toggleDarkMode()">
     </div>
   </div>
 
   <div class="main-content">
-    <h2>📢 Recent Complaints from Pune</h2>
+    <h2 id="recentComplaints">📢 Recent Complaints from Pune</h2>
     <div id="postsContainer" class="posts-container"></div>
-
     <div id="complaint-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4"></div>
   </div>
 
@@ -184,9 +212,80 @@
       alert("Logging out...");
       window.location.href = 'index.html';
     }
-  </script>
-  
 
+    // 🌍 Translations
+    const translations = {
+      en: {
+        mainTitle: "Speak for the Streets",
+        locationText: "📍 Pune",
+        navHome: "Home",
+        navSearch: "Search",
+        navReels: "Reels",
+        navMessages: "Messages",
+        navNotifications: "Notification",
+        navCreate: "Create",
+        navProfile: "Profile",
+        navAppearance: "Switch Appearance",
+        navSettings: "Settings",
+        navActivity: "Your Activity",
+        navLogout: "Log Out",
+        appearanceTitle: "Switch Appearance",
+        darkModeLabel: "Dark Mode",
+        recentComplaints: "📢 Recent Complaints from Pune"
+      },
+      hi: {
+        mainTitle: "सड़कों की आवाज़",
+        locationText: "📍 पुणे",
+        navHome: "होम",
+        navSearch: "खोजें",
+        navReels: "रील्स",
+        navMessages: "संदेश",
+        navNotifications: "सूचनाएं",
+        navCreate: "बनाएँ",
+        navProfile: "प्रोफ़ाइल",
+        navAppearance: "दिखावट बदलें",
+        navSettings: "सेटिंग्स",
+        navActivity: "आपकी गतिविधि",
+        navLogout: "लॉग आउट",
+        appearanceTitle: "दिखावट बदलें",
+        darkModeLabel: "डार्क मोड",
+        recentComplaints: "📢 पुणे से हाल की शिकायतें"
+      },
+      mr: {
+        mainTitle: "रस्त्यांसाठी आवाज",
+        locationText: "📍 पुणे",
+        navHome: "होम",
+        navSearch: "शोधा",
+        navReels: "रील्स",
+        navMessages: "संदेश",
+        navNotifications: "सूचना",
+        navCreate: "तयार करा",
+        navProfile: "प्रोफाइल",
+        navAppearance: "रूप बदला",
+        navSettings: "सेटिंग्ज",
+        navActivity: "तुमची कृती",
+        navLogout: "लॉग आउट",
+        appearanceTitle: "रूप बदला",
+        darkModeLabel: "डार्क मोड",
+        recentComplaints: "📢 पुण्यातील अलीकडील तक्रारी"
+      }
+    };
+
+    function setLanguage(lang) {
+      Object.keys(translations[lang]).forEach(id => {
+        if (document.getElementById(id)) {
+          document.getElementById(id).innerText = translations[lang][id];
+        }
+      });
+      localStorage.setItem("preferredLanguage", lang);
+    }
+
+    window.onload = () => {
+      const savedLang = localStorage.getItem("preferredLanguage") || "en";
+      document.getElementById("langSelect").value = savedLang;
+      setLanguage(savedLang);
+    };
+  </script>
 
   <!-- Load Dynamic Complaints -->
   <script src="complaints.js"></script>
