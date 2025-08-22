@@ -1,11 +1,9 @@
-
-
 const form = document.querySelector("form");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // ✅ use username field instead of email
+  
   const email = form.username.value;  
   const password = form.password.value;
 
@@ -13,7 +11,7 @@ form.addEventListener("submit", async (e) => {
     const response = await fetch("http://localhost:5000/signin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }), // backend expects "email"
+      body: JSON.stringify({ email, password }), 
     });
 
     const data = await response.json();
@@ -26,7 +24,3 @@ form.addEventListener("submit", async (e) => {
     alert("Signin failed. Please try again.");
   }
 });
-
-
-
-
