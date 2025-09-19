@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create - Speak for the Streets</title>
+  <!-- External CSS file -->
+  <link rel="stylesheet" href="create.css">
+</head>
+<body>
+  <div class="create-box">
+    <h2>Create Post</h2>
+    <form id="createForm">
+      <!-- Caption -->
+      <textarea id="caption" placeholder="Write a caption..." rows="4"></textarea>
+
+      <!-- Upload from gallery -->
+      <label> Upload from gallery:</label>
+      <input type="file" id="galleryUpload" accept="image/,video/">
+
+      <!-- Open camera (rear) -->
+      <label>Take photo / record video (rear camera):</label>
+      <input type="file" id="cameraUpload" accept="image/,video/" capture="environment">
+
+      <!-- Open camera (front) -->
+      <label> Take selfie (front camera):</label>
+      <input type="file" id="selfieUpload" accept="image/,video/" capture="user">
+
+      <button type="submit">Post</button>
+    </form>
+  </div>
+
+  <!-- Preview posts -->
+  <div id="posts"></div>
+
+  <script>
+    const form = document.getElementById("createForm");
+    const postsDiv = document.getElementById("posts");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const caption = document.getElementById("caption").value;
+      const galleryFile = document.getElementById("galleryUpload").files[0];
+      const cameraFile = document.getElementById("cameraUpload").files[0];
+      const selfieFile = document.getElementById("selfieUpload").files[0];
+
+      const mediaFile = galleryFile || cameraFile || selfieFile;
+
+      if (!caption && !mediaFile) {
+        alert("Please add a caption or media!");
+        return;
+      }
+
+      const post = document.createElement("div");
+      post.classList.add("post");
+
+      // Caption
+      if (caption) {
+        const captionEl = document.createElement("p");
+        captionEl.textContent = caption;
+        post.appendChild(captionEl);
+      }
+
+      // Media preview
+      if (mediaFile) {
+        const url = URL.createObjectURL(mediaFile);
+        if (mediaFile.type.startsWith("image/")) {
+          const img = document.createElement("img");
+          img.src = url;
+          post.appendChild(img);
+        } else if (mediaFile.type.startsWith("video/")) {
+          const video = document.createElement("video");
+          video.src = url;
+          video.controls = true;
+          post.appendChild(video);
+        }
+      }
+
+      postsDiv.prepend(post); // newest first
+      form.reset();
+    });
+  </script>
+</body>
+</html>
