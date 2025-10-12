@@ -1,85 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create - Speak for the Streets</title>
-  <!-- External CSS file -->
-  <link rel="stylesheet" href="create.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #111;
+      --secondary-color: #fff;
+      --accent-color: #2ecc71;
+      --bg-color: #f0f2f5;
+    }
+    body.dark { --primary-color:#fff; --secondary-color:#111; --bg-color:#181818; }
+    body { margin:0; font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif; background:var(--bg-color); color:var(--primary-color); }
+
+    header { background:#000; padding:1rem; display:flex; justify-content:space-between; align-items:center; color:#fff; position:sticky; top:0; z-index:1000; }
+    .location,.title { flex:1; } .location{text-align:left;} .title{text-align:center;font-weight:bold;}
+    .header-right{display:flex;align-items:center;gap:1rem;}
+    .language-switcher select{background:#000;color:white;border:1px solid #444;padding:4px 8px;border-radius:5px;cursor:pointer;}
+
+    /* Sidebar */
+    .sidebar { position:fixed; left:0; top:4rem; width:250px; height:calc(100% - 4rem); background:#000; color:white; display:flex; flex-direction:column; padding:1rem; gap:1rem; z-index:1500; }
+    .sidebar a{color:white;text-decoration:none;display:flex;align-items:center;gap:0.5rem;font-size:1.1rem;}
+
+    /* Search box */
+    #searchBox{display:none;margin-top:10px;padding:12px;background:#111;border-radius:8px;width:95%;}
+    #sidebarSearchInput{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:8px;}
+    #searchBtn{padding:8px;width:100%;border:none;border-radius:6px;background:#2ecc71;color:white;cursor:pointer;display:flex;justify-content:center;gap:6px;}
+    #closeSearch{position:absolute;top:6px;right:10px;background:transparent;border:none;font-size:20px;font-weight:bold;cursor:pointer;color:black;}
+
+    /* Appearance Popup */
+    .appearance-popup{display:none;position:absolute;right:1rem;top:4rem;background:var(--secondary-color);color:var(--primary-color);border:1px solid #ccc;border-radius:10px;padding:1rem;z-index:2000;width:220px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+    .appearance-popup .close-btn{position:absolute;top:6px;right:10px;background:transparent;border:none;font-size:18px;font-weight:bold;cursor:pointer;color:var(--primary-color);}
+    body.dark .appearance-popup{background:#222;color:#fff;border:1px solid #555;}
+    .dark-mode-toggle{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+
+    /* Notification Sidebar */
+    .notification-sidebar{position:fixed;top:4rem;left:0;width:320px;height:calc(100% - 4rem);background:#111;color:white;padding:1rem;transform:translateX(-100%);transition:transform 0.3s ease;z-index:2000;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.4);}
+    .notification-sidebar.show{transform:translateX(0);}
+    .notif-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+    .notification-item{background:#1a1a1a;border-radius:10px;padding:10px;margin-bottom:10px;cursor:pointer;transition:background 0.2s;}
+    .notification-item:hover{background:#2a2a2a;}
+    .notif-type{font-size:0.9rem;color:#2ecc71;} .notif-message{font-size:1rem;} .notif-time{font-size:0.8rem;color:#aaa;text-align:right;}
+
+    /* Main Content */
+    .main-content{margin-left:260px;padding:2rem;}
+    .tabs{display:flex;gap:1rem;margin-bottom:1rem;}
+    .tab-button{background:#ccc;padding:10px 20px;border-radius:5px;cursor:pointer;}
+    .tab-button.active{background:#2ecc71;color:white;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    form{display:flex;flex-direction:column;gap:1rem;max-width:500px;}
+    input,textarea,select{padding:10px;border:1px solid #ccc;border-radius:6px;}
+    button{background:#2ecc71;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;}
+    button:hover{background:#27ae60;}
+    .preview{margin-top:1rem;display:none;} .preview img,.preview video{max-width:100%;border-radius:10px;}
+  </style>
 </head>
 <body>
-  <div class="create-box">
-    <h2>Create Post</h2>
-    <form id="createForm">
-      <!-- Caption -->
-      <textarea id="caption" placeholder="Write a caption..." rows="4"></textarea>
+  <!-- Header -->
+  <header>
+    <div class="location" id="locationText">📍 Pune</div>
+    <div class="title" id="mainTitle">Speak for the Streets</div>
+    <div class="header-right">
+      <div class="language-switcher">
+        <select id="langSelect" onchange="setLanguage(this.value)">
+          <option value="en">🌐 English</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="mr">🌿 मराठी</option>
+        </select>
+      </div>
+    </div>
+  </header>
 
-      <!-- Upload from gallery -->
-      <label> Upload from gallery:</label>
-      <input type="file" id="galleryUpload" accept="image/,video/">
-
-      <!-- Open camera (rear) -->
-      <label>Take photo / record video (rear camera):</label>
-      <input type="file" id="cameraUpload" accept="image/,video/" capture="environment">
-
-      <!-- Open camera (front) -->
-      <label> Take selfie (front camera):</label>
-      <input type="file" id="selfieUpload" accept="image/,video/" capture="user">
-
-      <button type="submit">Post</button>
-    </form>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="main.html"><i class="fas fa-home"></i> <span id="navHome">Home</span></a>
+    <a href="#" id="searchTab"><i class="fas fa-search"></i> <span id="navSearch">Search</span></a>
+    <div id="searchBox">
+      <button id="closeSearch">×</button>
+      <input type="text" id="sidebarSearchInput" placeholder="Search complaints...">
+      <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+    </div>
+    <a href="reels.html"><i class="fas fa-video"></i> <span id="navReels">Reels</span></a>
+    <a href="#" id="notificationTab"><i class="fas fa-bell"></i> <span id="navNotifications">Notification</span></a>
+    <a href="create.html"><i class="fas fa-plus"></i> <span id="navCreate">Create</span></a>
+    <a href="uploads/profile.html"><i class="fas fa-user"></i> <span id="navProfile">Profile</span></a>
+    <a href="#" onclick="showAppearancePopup()"><i class="fas fa-adjust"></i> <span id="navAppearance">Switch Appearance</span></a>
+    <a href="#"><i class="fas fa-list"></i> <span id="navActivity">Your Activity</span></a>
+    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="navLogout">Log Out</span></a>
   </div>
 
-  <!-- Preview posts -->
-  <div id="posts"></div>
+  <!-- Notification Sidebar -->
+  <div class="notification-sidebar" id="notificationSidebar">
+    <div class="notif-header">
+      <h3>🔔 Notifications</h3>
+      <button onclick="document.getElementById('notificationSidebar').classList.remove('show')">×</button>
+    </div>
+    <div id="notificationList"></div>
+  </div>
 
+  <!-- Appearance Popup -->
+  <div class="appearance-popup" id="appearance-popup">
+    <button class="close-btn" onclick="closeAppearancePopup()">×</button>
+    <strong id="appearanceTitle">Switch Appearance</strong>
+    <div class="dark-mode-toggle">
+      <span id="darkModeLabel">Dark Mode</span>
+      <input type="checkbox" id="darkToggle" onclick="toggleDarkMode()">
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2 id="createHeading">Create</h2>
+    <div class="tabs">
+      <div class="tab-button active" onclick="openTab('complaintTabContent', this)" id="complaintTab">Complaint</div>
+      <div class="tab-button" onclick="openTab('reelTabContent', this)" id="reelTab">Reel</div>
+    </div>
+
+    <!-- Complaint Form -->
+    <div id="complaintTabContent" class="tab-content active">
+      <form id="createComplaintForm">
+        <label for="title" id="labelComplaintTitle">Complaint Title</label>
+        <input type="text" id="title" required>
+        <label for="category" id="labelCategory">Category</label>
+        <select id="category" required>
+          <option value="roads">Roads</option>
+          <option value="garbage">Garbage</option>
+          <option value="water">Water</option>
+          <option value="electricity">Electricity</option>
+        </select>
+        <label for="description" id="labelDescription">Description</label>
+        <textarea id="description" rows="4" required></textarea>
+        <label for="image" id="labelUploadImage">Upload Image</label>
+        <input type="file" id="image" accept="image/*">
+        <div class="preview" id="imagePreview"><img src="" alt="Preview"></div>
+        <button type="submit" id="btnSubmitComplaint">Submit Complaint</button>
+      </form>
+    </div>
+
+    <!-- Reel Form -->
+    <div id="reelTabContent" class="tab-content">
+      <form id="createReelForm">
+        <label for="reelTitle" id="labelReelTitle">Reel Title / Caption</label>
+        <input type="text" id="reelTitle" required>
+        <label for="reelCategory" id="labelReelCategory">Category / Tags</label>
+        <input type="text" id="reelCategory" required>
+        <label for="reelVideo" id="labelUploadVideo">Upload Reel Video</label>
+        <input type="file" id="reelVideo" accept="video/*">
+        <div class="preview" id="videoPreview"><video controls></video></div>
+        <button type="submit" id="btnSubmitReel">Submit Reel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script>
-    const form = document.getElementById("createForm");
-    const postsDiv = document.getElementById("posts");
+    function showAppearancePopup(){document.getElementById("appearance-popup").style.display="block";}
+    function closeAppearancePopup(){document.getElementById("appearance-popup").style.display="none";}
+    function toggleDarkMode(){document.body.classList.toggle("dark");}
+    function logout(){alert("Logging out..."); window.location.href="index.html";}
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
+    // Tabs
+    function openTab(tabName, el){
+      document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+      el.classList.add('active');
+    }
 
-      const caption = document.getElementById("caption").value;
-      const galleryFile = document.getElementById("galleryUpload").files[0];
-      const cameraFile = document.getElementById("cameraUpload").files[0];
-      const selfieFile = document.getElementById("selfieUpload").files[0];
-
-      const mediaFile = galleryFile || cameraFile || selfieFile;
-
-      if (!caption && !mediaFile) {
-        alert("Please add a caption or media!");
-        return;
-      }
-
-      const post = document.createElement("div");
-      post.classList.add("post");
-
-      // Caption
-      if (caption) {
-        const captionEl = document.createElement("p");
-        captionEl.textContent = caption;
-        post.appendChild(captionEl);
-      }
-
-      // Media preview
-      if (mediaFile) {
-        const url = URL.createObjectURL(mediaFile);
-        if (mediaFile.type.startsWith("image/")) {
-          const img = document.createElement("img");
-          img.src = url;
-          post.appendChild(img);
-        } else if (mediaFile.type.startsWith("video/")) {
-          const video = document.createElement("video");
-          video.src = url;
-          video.controls = true;
-          post.appendChild(video);
-        }
-      }
-
-      postsDiv.prepend(post); // newest first
-      form.reset();
+    // Search Logic
+    document.getElementById("searchTab").addEventListener("click", function(e){
+      e.preventDefault(); const sb=document.getElementById("searchBox");
+      sb.style.display = sb.style.display==="block" ? "none":"block";
     });
+    document.getElementById("closeSearch").addEventListener("click", ()=>document.getElementById("searchBox").style.display="none");
+
+    // Notification Logic
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const notifLink=document.getElementById('notificationTab');
+      const notifSidebar=document.getElementById('notificationSidebar');
+      notifLink.addEventListener('click', e=>{
+        e.preventDefault(); notifSidebar.classList.toggle('show'); renderNotifications();
+      });
+      function renderNotifications(){
+        const data=[
+          {type:'Vote', message:'Someone upvoted your complaint.', time:'Just now'},
+          {type:'Comment', message:'New comment on your complaint.', time:'5m ago'},
+          {type:'Update', message:'Your complaint status changed.', time:'10m ago'}
+        ];
+        const list=document.getElementById('notificationList'); list.innerHTML='';
+        data.forEach(n=>{
+          const div=document.createElement('div'); div.className='notification-item';
+          div.innerHTML=`<div class="notif-type">${n.type}</div><div class="notif-message">${n.message}</div><div class="notif-time">${n.time}</div>`;
+          list.appendChild(div);
+        });
+      }
+    });
+
+    // Form logic
+    document.getElementById("createComplaintForm").addEventListener("submit",e=>{e.preventDefault();alert("Complaint submitted!");});
+    document.getElementById("createReelForm").addEventListener("submit",e=>{e.preventDefault();alert("Reel submitted!");});
+
+    // Translations
+    const translations={
+      en:{mainTitle:"Speak for the Streets",locationText:"📍 Pune",navHome:"Home",navSearch:"Search",navReels:"Reels",navNotifications:"Notification",navCreate:"Create",navProfile:"Profile",navAppearance:"Switch Appearance",navActivity:"Your Activity",navLogout:"Log Out",appearanceTitle:"Switch Appearance",darkModeLabel:"Dark Mode",createHeading:"Create",complaintTab:"Complaint",reelTab:"Reel",labelComplaintTitle:"Complaint Title",labelCategory:"Category",labelDescription:"Description",labelUploadImage:"Upload Image",btnSubmitComplaint:"Submit Complaint",labelReelTitle:"Reel Title / Caption",labelReelCategory:"Category / Tags",labelUploadVideo:"Upload Reel Video",btnSubmitReel:"Submit Reel"},
+      hi:{mainTitle:"सड़कों की आवाज़",locationText:"📍 पुणे",navHome:"होम",navSearch:"खोजें",navReels:"रील्स",navNotifications:"सूचनाएं",navCreate:"बनाएँ",navProfile:"प्रोफ़ाइल",navAppearance:"दिखावट बदलें",navActivity:"आपकी गतिविधि",navLogout:"लॉग आउट",appearanceTitle:"दिखावट बदलें",darkModeLabel:"डार्क मोड",createHeading:"सिर्जित करें",complaintTab:"शिकायत",reelTab:"रील",labelComplaintTitle:"शिकायत का शीर्षक",labelCategory:"श्रेणी",labelDescription:"विवरण",labelUploadImage:"छवि अपलोड करें",btnSubmitComplaint:"शिकायत जमा करें",labelReelTitle:"रील का शीर्षक / कैप्शन",labelReelCategory:"श्रेणी / टैग",labelUploadVideo:"रील वीडियो अपलोड करें",btnSubmitReel:"रील जमा करें"},
+      mr:{mainTitle:"रस्त्यांसाठी आवाज",locationText:"📍 पुणे",navHome:"होम",navSearch:"शोधा",navReels:"रील्स",navNotifications:"सूचना",navCreate:"तयार करा",navProfile:"प्रोफाइल",navAppearance:"रूप बदला",navActivity:"तुमची कृती",navLogout:"लॉग आउट",appearanceTitle:"रूप बदला",darkModeLabel:"डार्क मोड",createHeading:"निर्माण करा",complaintTab:"तक्रार",reelTab:"रील",labelComplaintTitle:"तक्रारीचे शीर्षक",labelCategory:"श्रेणी",labelDescription:"वर्णन",labelUploadImage:"प्रतिमा अपलोड करा",btnSubmitComplaint:"तक्रार सबमिट करा",labelReelTitle:"रील शीर्षक / कॅप्शन",labelReelCategory:"श्रेणी / टॅग",labelUploadVideo:"रील व्हिडिओ अपलोड करा",btnSubmitReel:"रील सबमिट करा"}
+    };
+    function setLanguage(lang){Object.keys(translations[lang]).forEach(id=>{if(document.getElementById(id))document.getElementById(id).innerText=translations[lang][id];}); localStorage.setItem("preferredLanguage",lang);}
+    window.onload=()=>{const savedLang=localStorage.getItem("preferredLanguage")||"en"; document.getElementById("langSelect").value=savedLang; setLanguage(savedLang);}
   </script>
 </body>
 </html>
