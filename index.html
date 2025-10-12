@@ -67,7 +67,7 @@
     <header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-4 bg-transparent">
       <div class="flex items-center space-x-2">
         <span class="text-xl">📍</span>
-        <span id="location" class="text-lg font-medium">Pune, India</span>
+        <span id="location" class="text-lg font-medium">Fetching location...</span>
       </div>
       <h1 id="site_title" class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Speak for the Streets</h1>
       <div class="flex items-center space-x-4">
@@ -76,7 +76,7 @@
           <option value="hi">हिंदी</option>
           <option value="mr">मराठी</option>
         </select>
-        <a id="sign_in" href="signin.html" class="underline">Sign In</a>
+        <a id="sign_in" href="login.html" class="underline">Sign In</a>
         <button class="text-white text-2xl">☰</button>
       </div>
     </header>
@@ -123,14 +123,18 @@
       </div>
     </div>
 
-    <!-- ✅ Fixed CTA button -->
-    <button id="upvote_now" class="mt-6 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-full transition duration-300 animate-pulse">
-      Upvote Now
-    </button>
+    <!-- CTA button -->
+    <a href="main.html">
+      <button id="upvote_now" class="mt-6 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-full transition duration-300 animate-pulse">
+        Upvote Now
+      </button>
+    </a>
   </section>
 
-  <!-- AOS + Logic -->
+  <!-- AOS JS -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- Main Script -->
   <script>
     AOS.init();
 
@@ -139,35 +143,55 @@
       "get_started","slider1","slider2","slider3","slider4","upvote_now"
     ];
 
-    // Embedded translations
     const translations = {
-      en: { site_title: "Speak for the Streets", location: "Pune, India", sign_in: "Sign In",
+      en: {
+        site_title: "Speak for the Streets",
+        location: "Pune, India",
+        sign_in: "Sign In",
         raise_voice: "Raise Your Voice for a Better Tomorrow",
         report_desc: "Report civic issues around you – Roads, Garbage, Water, and more.",
         report_extra: "From potholes to progress, transform your locality — one photo, one report and one vote. Together, let’s show our unity and make the change happen.",
-        get_started: "Get Started", slider1: "Potholes today. Lives at risk tomorrow. Upvote now—force action.",
+        get_started: "Get Started",
+        slider1: "Potholes today. Lives at risk tomorrow. Upvote now—force action.",
         slider2: "Potholes can’t speak. You can. Upvote and be heard.",
-        slider3: "Trash in water, poison in life.", slider4: "Water is life, not a dustbin.", upvote_now: "Upvote Now" },
-      hi: { site_title: "सड़कों के लिए बोलें", location: "पुणे, भारत", sign_in: "साइन इन",
+        slider3: "Trash in water, poison in life.",
+        slider4: "Water is life, not a dustbin.",
+        upvote_now: "Upvote Now"
+      },
+      hi: {
+        site_title: "सड़कों के लिए बोलें",
+        location: "पुणे, भारत",
+        sign_in: "साइन इन",
         raise_voice: "बेहतर कल के लिए अपनी आवाज उठाएँ",
         report_desc: "अपने आसपास की नागरिक समस्याओं की रिपोर्ट करें – सड़कें, कचरा, पानी और अधिक।",
         report_extra: "गड्ढों से प्रगति तक, अपने इलाके को बदलें — एक फोटो, एक रिपोर्ट और एक वोट। मिलकर, आइए अपनी एकता दिखाएँ और बदलाव लाएँ।",
-        get_started: "शुरू करें", slider1: "आज गड्ढे, कल जान खतरे में। अभी वोट करें—कार्रवाई करवाएँ।",
+        get_started: "शुरू करें",
+        slider1: "आज गड्ढे, कल जान खतरे में। अभी वोट करें—कार्रवाई करवाएँ।",
         slider2: "गड्ढे बोल नहीं सकते। आप बोल सकते हैं। वोट करें और अपनी बात रखें।",
-        slider3: "पानी में कचरा, जीवन में ज़हर।", slider4: "पानी जीवन है, कूड़ादान नहीं।", upvote_now: "अभी वोट करें" },
-      mr: { site_title: "रस्त्यांसाठी बोला", location: "पुणे, भारत", sign_in: "साइन इन",
+        slider3: "पानी में कचरा, जीवन में ज़हर।",
+        slider4: "पानी जीवन है, कूड़ादान नहीं।",
+        upvote_now: "अभी वोट करें"
+      },
+      mr: {
+        site_title: "रस्त्यांसाठी बोला",
+        location: "पुणे, भारत",
+        sign_in: "साइन इन",
         raise_voice: "चांगल्या उद्यासाठी आपला आवाज उठवा",
         report_desc: "आपल्या आसपासच्या नागरी समस्या नोंदवा – रस्ते, कचरा, पाणी आणि इतर.",
         report_extra: "खड्ड्यांपासून प्रगतीपर्यंत, आपल्या भागाचा बदल करा — एक फोटो, एक रिपोर्ट आणि एक मत. चला, एकत्र येऊ आणि बदल घडवू.",
-        get_started: "सुरू करा", slider1: "आज खड्डे, उद्या जीव धोक्यात. आत्ताच मत द्या—कारवाई घडवा.",
+        get_started: "सुरू करा",
+        slider1: "आज खड्डे, उद्या जीव धोक्यात. आत्ताच मत द्या—कारवाई घडवा.",
         slider2: "खड्डे बोलत नाहीत. तुम्ही बोलू शकता. मत द्या आणि आपला आवाज द्या.",
-        slider3: "पाण्यात कचरा, जीवनात विष.", slider4: "पाणी म्हणजे जीवन, कचरापेटी नाही.", upvote_now: "आत्ताच मत द्या" }
+        slider3: "पाण्यात कचरा, जीवनात विष.",
+        slider4: "पाणी म्हणजे जीवन, कचरापेटी नाही.",
+        upvote_now: "आत्ताच मत द्या"
+      }
     };
 
     function loadLanguage(lang) {
       elementsToTranslate.forEach(id => {
         const el = document.getElementById(id);
-        if (el && translations[lang][id]) {
+        if (el && translations[lang] && translations[lang][id]) {
           el.textContent = translations[lang][id];
         }
       });
@@ -180,18 +204,32 @@
     // Load default English
     loadLanguage("en");
 
-    // ✅ Upvote button login check
-    function isUserLoggedIn() {
-      return localStorage.getItem("isLoggedIn") === "true";
-    }
+    // Geolocation + OpenCage API
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
 
-    document.getElementById("upvote_now").addEventListener("click", function () {
-      if (isUserLoggedIn()) {
-        window.location.href = "main.html";
-      } else {
-        window.location.href = "signup.html";
+      try {
+        const apiKey = "a98b355f15554a5c90f82ac04fd37da0";
+        const response = await fetch(
+          `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`
+        );
+        const data = await response.json();
+
+        const city = data.results[0].components.city || data.results[0].components.town || data.results[0].components.village || "Unknown city";
+        const country = data.results[0].components.country || "Unknown country";
+
+        document.getElementById("location").textContent = `${city}, ${country}`;
+      } catch (error) {
+        console.error("Error fetching location:", error);
+        document.getElementById("location").textContent = "Location unavailable";
       }
+    }, (error) => {
+      console.error("Location access denied or unavailable", error);
+      document.getElementById("location").textContent = "Location access denied";
     });
   </script>
+  <script src="preferences.js"></script>
+
 </body>
 </html>
