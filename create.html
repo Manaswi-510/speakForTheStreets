@@ -20,23 +20,19 @@
     .header-right{display:flex;align-items:center;gap:1rem;}
     .language-switcher select{background:#000;color:white;border:1px solid #444;padding:4px 8px;border-radius:5px;cursor:pointer;}
 
-    /* Sidebar */
     .sidebar { position:fixed; left:0; top:4rem; width:250px; height:calc(100% - 4rem); background:#000; color:white; display:flex; flex-direction:column; padding:1rem; gap:1rem; z-index:1500; }
     .sidebar a{color:white;text-decoration:none;display:flex;align-items:center;gap:0.5rem;font-size:1.1rem;}
 
-    /* Search box */
     #searchBox{display:none;margin-top:10px;padding:12px;background:#111;border-radius:8px;width:95%;}
     #sidebarSearchInput{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:8px;}
     #searchBtn{padding:8px;width:100%;border:none;border-radius:6px;background:#2ecc71;color:white;cursor:pointer;display:flex;justify-content:center;gap:6px;}
     #closeSearch{position:absolute;top:6px;right:10px;background:transparent;border:none;font-size:20px;font-weight:bold;cursor:pointer;color:black;}
 
-    /* Appearance Popup */
     .appearance-popup{display:none;position:absolute;right:1rem;top:4rem;background:var(--secondary-color);color:var(--primary-color);border:1px solid #ccc;border-radius:10px;padding:1rem;z-index:2000;width:220px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
     .appearance-popup .close-btn{position:absolute;top:6px;right:10px;background:transparent;border:none;font-size:18px;font-weight:bold;cursor:pointer;color:var(--primary-color);}
     body.dark .appearance-popup{background:#222;color:#fff;border:1px solid #555;}
     .dark-mode-toggle{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
 
-    /* Notification Sidebar */
     .notification-sidebar{position:fixed;top:4rem;left:0;width:320px;height:calc(100% - 4rem);background:#111;color:white;padding:1rem;transform:translateX(-100%);transition:transform 0.3s ease;z-index:2000;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.4);}
     .notification-sidebar.show{transform:translateX(0);}
     .notif-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
@@ -44,7 +40,6 @@
     .notification-item:hover{background:#2a2a2a;}
     .notif-type{font-size:0.9rem;color:#2ecc71;} .notif-message{font-size:1rem;} .notif-time{font-size:0.8rem;color:#aaa;text-align:right;}
 
-    /* Main Content */
     .main-content{margin-left:260px;padding:2rem;}
     .tabs{display:flex;gap:1rem;margin-bottom:1rem;}
     .tab-button{background:#ccc;padding:10px 20px;border-radius:5px;cursor:pointer;}
@@ -63,7 +58,6 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header>
     <div class="location" id="locationText">📍 Pune</div>
     <div class="title" id="mainTitle">Speak for the Streets</div>
@@ -78,7 +72,6 @@
     </div>
   </header>
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <a href="main.html"><i class="fas fa-home"></i> <span id="navHome">Home</span></a>
     <a href="#" id="searchTab"><i class="fas fa-search"></i> <span id="navSearch">Search</span></a>
@@ -90,13 +83,12 @@
     <a href="reels.html"><i class="fas fa-video"></i> <span id="navReels">Reels</span></a>
     <a href="#" id="notificationTab"><i class="fas fa-bell"></i> <span id="navNotifications">Notification</span></a>
     <a href="create.html"><i class="fas fa-plus"></i> <span id="navCreate">Create</span></a>
-    <a href="uploads/profile.html"><i class="fas fa-user"></i> <span id="navProfile">Profile</span></a>
+    <a href="profile.html"><i class="fas fa-user"></i> <span id="navProfile">Profile</span></a>
     <a href="#" onclick="showAppearancePopup()"><i class="fas fa-adjust"></i> <span id="navAppearance">Switch Appearance</span></a>
     <a href="#"><i class="fas fa-list"></i> <span id="navActivity">Your Activity</span></a>
     <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="navLogout">Log Out</span></a>
   </div>
 
-  <!-- Notification Sidebar -->
   <div class="notification-sidebar" id="notificationSidebar">
     <div class="notif-header">
       <h3>🔔 Notifications</h3>
@@ -105,7 +97,6 @@
     <div id="notificationList"></div>
   </div>
 
-  <!-- Appearance Popup -->
   <div class="appearance-popup" id="appearance-popup">
     <button class="close-btn" onclick="closeAppearancePopup()">×</button>
     <strong id="appearanceTitle">Switch Appearance</strong>
@@ -115,7 +106,6 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <h2 id="createHeading">Create</h2>
     <div class="tabs">
@@ -123,7 +113,6 @@
       <div class="tab-button" onclick="openTab('reelTabContent', this)" id="reelTab">Reel</div>
     </div>
 
-    <!-- Complaint Form -->
     <div id="complaintTabContent" class="tab-content active">
       <form id="createComplaintForm">
         <label for="title" id="labelComplaintTitle">Complaint Title</label>
@@ -145,7 +134,6 @@
       </form>
     </div>
 
-    <!-- Reel Form (unchanged) -->
     <div id="reelTabContent" class="tab-content">
       <form id="createReelForm">
         <label for="reelTitle" id="labelReelTitle">Reel Title / Caption</label>
@@ -160,14 +148,23 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script>
+    // Check if user is logged in
+    const userEmail = localStorage.getItem('userEmail');
+    if(!userEmail){
+      alert('Please login first!');
+      window.location.href = 'index.html';
+    }
+
     function showAppearancePopup(){document.getElementById("appearance-popup").style.display="block";}
     function closeAppearancePopup(){document.getElementById("appearance-popup").style.display="none";}
     function toggleDarkMode(){document.body.classList.toggle("dark");}
-    function logout(){alert("Logging out..."); window.location.href="index.html";}
+    function logout(){
+      localStorage.removeItem('userEmail');
+      alert("Logging out..."); 
+      window.location.href="index.html";
+    }
 
-    // Tabs
     function openTab(tabName, el){
       document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.remove('active'));
       document.getElementById(tabName).classList.add('active');
@@ -175,32 +172,57 @@
       el.classList.add('active');
     }
 
-    // Search Logic
     document.getElementById("searchTab").addEventListener("click", function(e){
-      e.preventDefault(); const sb=document.getElementById("searchBox");
+      e.preventDefault(); 
+      const sb=document.getElementById("searchBox");
       sb.style.display = sb.style.display==="block" ? "none":"block";
     });
     document.getElementById("closeSearch").addEventListener("click", ()=>document.getElementById("searchBox").style.display="none");
 
-    // Notification Logic
-    document.addEventListener('DOMContentLoaded', ()=>{const notifLink=document.getElementById('notificationTab'); const notifSidebar=document.getElementById('notificationSidebar'); notifLink.addEventListener('click', e=>{e.preventDefault(); notifSidebar.classList.toggle('show'); renderNotifications();}); function renderNotifications(){const data=[{type:'Vote', message:'Someone upvoted your complaint.', time:'Just now'},{type:'Comment', message:'New comment on your complaint.', time:'5m ago'},{type:'Update', message:'Your complaint status changed.', time:'10m ago'}]; const list=document.getElementById('notificationList'); list.innerHTML=''; data.forEach(n=>{const div=document.createElement('div'); div.className='notification-item'; div.innerHTML=`<div class="notif-type">${n.type}</div><div class="notif-message">${n.message}</div><div class="notif-time">${n.time}</div>`; list.appendChild(div);});}});
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const notifLink=document.getElementById('notificationTab'); 
+      const notifSidebar=document.getElementById('notificationSidebar'); 
+      notifLink.addEventListener('click', e=>{
+        e.preventDefault(); 
+        notifSidebar.classList.toggle('show'); 
+        renderNotifications();
+      }); 
+      
+      function renderNotifications(){
+        const data=[
+          {type:'Vote', message:'Someone upvoted your complaint.', time:'Just now'},
+          {type:'Comment', message:'New comment on your complaint.', time:'5m ago'},
+          {type:'Update', message:'Your complaint status changed.', time:'10m ago'}
+        ]; 
+        const list=document.getElementById('notificationList'); 
+        list.innerHTML=''; 
+        data.forEach(n=>{
+          const div=document.createElement('div'); 
+          div.className='notification-item'; 
+          div.innerHTML=`<div class="notif-type">${n.type}</div><div class="notif-message">${n.message}</div><div class="notif-time">${n.time}</div>`; 
+          list.appendChild(div);
+        });
+      }
+    });
 
-    // Image Preview
     document.getElementById("image").addEventListener("change", e=>{
       const file = e.target.files[0];
       const preview = document.querySelector("#imagePreview img");
-      if(file){ preview.src = URL.createObjectURL(file); document.getElementById("imagePreview").style.display="block"; }
-      else{ document.getElementById("imagePreview").style.display="none"; }
+      if(file){ 
+        preview.src = URL.createObjectURL(file); 
+        document.getElementById("imagePreview").style.display="block"; 
+      } else{ 
+        document.getElementById("imagePreview").style.display="none"; 
+      }
     });
 
-    // Geolocation
     let latitude="", longitude="";
     navigator.geolocation.getCurrentPosition(pos=>{
       latitude=pos.coords.latitude;
       longitude=pos.coords.longitude;
     }, ()=>{ console.warn("Could not get location"); });
 
-    // Complaint Form Submission
+    // UPDATED: Complaint Form Submission with userEmail
     const complaintForm = document.getElementById("createComplaintForm");
     complaintForm.addEventListener("submit", async e=>{
       e.preventDefault();
@@ -211,26 +233,53 @@
       formData.append("image", document.getElementById("image").files[0]);
       formData.append("latitude", latitude);
       formData.append("longitude", longitude);
+      formData.append("userEmail", userEmail); // ADDED: Send logged-in user email
 
       const messageDiv = document.getElementById("complaintMessage");
 
       try{
-        const res = await fetch("http://localhost:5000/report", { method:"POST", body: formData });
+        const res = await fetch("http://localhost:5000/report", { 
+          method:"POST", 
+          body: formData 
+        });
         const data = await res.json();
-        if(res.ok){ messageDiv.innerText = data.message; messageDiv.className="message success"; complaintForm.reset(); document.getElementById("imagePreview").style.display="none"; }
-        else{ messageDiv.innerText = data.message||"Error submitting complaint"; messageDiv.className="message error"; }
+        if(res.ok){ 
+          messageDiv.innerText = data.message; 
+          messageDiv.className="message success"; 
+          complaintForm.reset(); 
+          document.getElementById("imagePreview").style.display="none";
+          setTimeout(()=>{
+            window.location.href = 'profile.html'; // Redirect to profile
+          }, 1500);
+        } else{ 
+          messageDiv.innerText = data.message||"Error submitting complaint"; 
+          messageDiv.className="message error"; 
+        }
       } catch(err){
-        messageDiv.innerText="Failed to connect to server"; messageDiv.className="message error";
+        messageDiv.innerText="Failed to connect to server"; 
+        messageDiv.className="message error";
       }
     });
 
-    // Reel form alert placeholder
-    document.getElementById("createReelForm").addEventListener("submit",e=>{e.preventDefault();alert("Reel submitted!");});
+    document.getElementById("createReelForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      alert("Reel submitted!");
+    });
 
-    // Translations
-    const translations={ /* your translations object as before */ };
-    function setLanguage(lang){Object.keys(translations[lang]).forEach(id=>{if(document.getElementById(id))document.getElementById(id).innerText=translations[lang][id];}); localStorage.setItem("preferredLanguage",lang);}
-    window.onload=()=>{const savedLang=localStorage.getItem("preferredLanguage")||"en"; document.getElementById("langSelect").value=savedLang; setLanguage(savedLang);}
+    const translations={};
+    function setLanguage(lang){
+      Object.keys(translations[lang]||{}).forEach(id=>{
+        if(document.getElementById(id))
+          document.getElementById(id).innerText=translations[lang][id];
+      }); 
+      localStorage.setItem("preferredLanguage",lang);
+    }
+    
+    window.onload=()=>{
+      const savedLang=localStorage.getItem("preferredLanguage")||"en"; 
+      document.getElementById("langSelect").value=savedLang; 
+      setLanguage(savedLang);
+    }
   </script>
 </body>
 </html>
