@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reels - Speak for the Streets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border-right: 1px solid #333;
+      position: relative;
+    }
+
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      margin: 15px 0;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .sidebar a:hover {
+      color: #1db954;
+    }
+
+    /* Search Box */
+    #searchBox {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 260px;
+      background: #111;
+      padding: 15px;
+      border-radius: 10px;
+      width: 300px;
+      z-index: 1000;
+    }
+
+    #sidebarSearchInput {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    #searchBtn {
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      background: #2ecc71;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .close-search {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      color: black;
+    }
+
+    /* Main reels container */
+    .main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+    }
+
+    .reel {
+      position: relative;
+      width: 380px;
+      height: 700px;
+      background: #000;
+      margin: 20px auto;
+      border-radius: 16px;
+      overflow: hidden;
+      scroll-snap-align: start;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Right side icons */
+    .actions {
+      position: absolute;
+      right: -70px;
+      bottom: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .actions button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 26px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .actions button:hover {
+      transform: scale(1.2);
+    }
+
+    .actions span {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #ddd;
+    }
+
+    .upvoted {
+      color: #1db954 !important; /* Green when upvoted */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="main.html"><i class="fas fa-home"></i> Home</a>
+    <a id="searchToggle"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+    <a href="reels.html"><i class="fa-solid fa-film"></i> Reels</a>
+    <a href="#"><i class="fa-solid fa-bell"></i> Notifications</a>
+    <a href="create.html"><i class="fa-solid fa-circle-plus"></i> Create</a>
+    <a href="uploads/profile.html"><i class="fas fa-user"></i> <span id="navProfile">Profile</span></a>
+  </div> <!-- ✅ FIXED: Sidebar closed here -->
+
+  <!-- Search Box -->
+  <div id="searchBox">
+    <button id="closeSearch" class="close-search">×</button>
+    <input type="text" id="sidebarSearchInput" placeholder="Search complaints...">
+    <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+  </div>
+
+  <!-- Main Reels Feed -->
+  <div class="main" id="reelsContainer"></div>
+
+  <script>
+    // Dummy reels data (replace with backend fetch later)
+    const reels = [
+      { src: "reel1.mp4", upvotes: 12, comments: 5, hasUpvoted: false },
+      { src: "reel2.mp4", upvotes: 30, comments: 8, hasUpvoted: false },
+      { src: "reel3.mp4", upvotes: 5, comments: 2, hasUpvoted: false },
+    ];
+
+    const container = document.getElementById("reelsContainer");
+
+    reels.forEach((reel, index) => {
+      const reelDiv = document.createElement("div");
+      reelDiv.classList.add("reel");
+      reelDiv.innerHTML = `
+        <video src="${reel.src}" muted loop playsinline></video>
+        <div class="actions">
+          <div>
+            <button id="upvote-btn-${index}" onclick="upvote(${index})">
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <span id="upvotes-${index}">${reel.upvotes}</span>
+          </div>
+          <div>
+            <button><i class="fa-regular fa-comment"></i></button>
+            <span>${reel.comments}</span>
+          </div>
+          <div>
+            <button onclick="shareReel(${index})"><i class="fa-solid fa-share-nodes"></i></button>
+            <span>Share</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(reelDiv);
+    });
+
+    // Auto-play current reel when visible
+    const videos = document.querySelectorAll("video");
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.play();
+        } else {
+          entry.target.pause();
+        }
+      });
+    }, { threshold: 0.8 });
+    videos.forEach(video => observer.observe(video));
+
+    // Upvote function (only once per user)
+    function upvote(index) {
+      if (!reels[index].hasUpvoted) {
+        reels[index].upvotes++;
+        reels[index].hasUpvoted = true;
+        document.getElementById(`upvotes-${index}`).innerText = reels[index].upvotes;
+        document.getElementById(`upvote-btn-${index}`).classList.add("upvoted");
+      }
+    }
+
+    // Share function (dummy for now)
+    function shareReel(index) {
+      alert("Reel shared anonymously with nearby users!");
+    }
+
+    // Search toggle
+    document.getElementById("searchToggle").addEventListener("click", () => {
+      document.getElementById("searchBox").style.display = "block";
+    });
+
+    // Close search box
+    document.getElementById("closeSearch").addEventListener("click", () => {
+      document.getElementById("searchBox").style.display = "none";
+    });
+  </script>
+  <script src="preferences.js"></script>
+
+</body>
+</html>
