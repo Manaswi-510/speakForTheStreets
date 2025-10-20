@@ -149,137 +149,264 @@
   </div>
 
   <script>
-    // Check if user is logged in
-    const userEmail = localStorage.getItem('userEmail');
-    if(!userEmail){
-      alert('Please login first!');
-      window.location.href = 'index.html';
-    }
+// Fixed script section for create.html
+// Replace the entire <script> section at the bottom of create.html with this
 
-    function showAppearancePopup(){document.getElementById("appearance-popup").style.display="block";}
-    function closeAppearancePopup(){document.getElementById("appearance-popup").style.display="none";}
-    function toggleDarkMode(){document.body.classList.toggle("dark");}
-    function logout(){
-      localStorage.removeItem('userEmail');
-      alert("Logging out..."); 
-      window.location.href="index.html";
-    }
+// Check if user is logged in
+const userEmail = localStorage.getItem('userEmail');
+if(!userEmail){
+  alert('Please login first!');
+  window.location.href = 'signin.html';
+}
 
-    function openTab(tabName, el){
-      document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
-      el.classList.add('active');
-    }
+function showAppearancePopup(){document.getElementById("appearance-popup").style.display="block";}
+function closeAppearancePopup(){document.getElementById("appearance-popup").style.display="none";}
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+}
+function logout(){
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('userFullname');
+  alert("Logging out..."); 
+  window.location.href="index.html";
+}
 
-    document.getElementById("searchTab").addEventListener("click", function(e){
-      e.preventDefault(); 
-      const sb=document.getElementById("searchBox");
-      sb.style.display = sb.style.display==="block" ? "none":"block";
+function openTab(tabName, el){
+  document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+document.getElementById("searchTab").addEventListener("click", function(e){
+  e.preventDefault(); 
+  const sb=document.getElementById("searchBox");
+  sb.style.display = sb.style.display==="block" ? "none":"block";
+});
+document.getElementById("closeSearch").addEventListener("click", ()=>document.getElementById("searchBox").style.display="none");
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const notifLink=document.getElementById('notificationTab'); 
+  const notifSidebar=document.getElementById('notificationSidebar'); 
+  notifLink.addEventListener('click', e=>{
+    e.preventDefault(); 
+    notifSidebar.classList.toggle('show'); 
+    renderNotifications();
+  }); 
+  
+  function renderNotifications(){
+    const data=[
+      {type:'Vote', message:'Someone upvoted your complaint.', time:'Just now'},
+      {type:'Comment', message:'New comment on your complaint.', time:'5m ago'},
+      {type:'Update', message:'Your complaint status changed.', time:'10m ago'}
+    ]; 
+    const list=document.getElementById('notificationList'); 
+    list.innerHTML=''; 
+    data.forEach(n=>{
+      const div=document.createElement('div'); 
+      div.className='notification-item'; 
+      div.innerHTML=`<div class="notif-type">${n.type}</div><div class="notif-message">${n.message}</div><div class="notif-time">${n.time}</div>`; 
+      list.appendChild(div);
     });
-    document.getElementById("closeSearch").addEventListener("click", ()=>document.getElementById("searchBox").style.display="none");
+  }
+  
+  // Apply saved theme
+  if(localStorage.getItem('darkMode') === 'true'){
+    document.body.classList.add('dark');
+    document.getElementById('darkToggle').checked = true;
+  }
+});
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const notifLink=document.getElementById('notificationTab'); 
-      const notifSidebar=document.getElementById('notificationSidebar'); 
-      notifLink.addEventListener('click', e=>{
-        e.preventDefault(); 
-        notifSidebar.classList.toggle('show'); 
-        renderNotifications();
-      }); 
-      
-      function renderNotifications(){
-        const data=[
-          {type:'Vote', message:'Someone upvoted your complaint.', time:'Just now'},
-          {type:'Comment', message:'New comment on your complaint.', time:'5m ago'},
-          {type:'Update', message:'Your complaint status changed.', time:'10m ago'}
-        ]; 
-        const list=document.getElementById('notificationList'); 
-        list.innerHTML=''; 
-        data.forEach(n=>{
-          const div=document.createElement('div'); 
-          div.className='notification-item'; 
-          div.innerHTML=`<div class="notif-type">${n.type}</div><div class="notif-message">${n.message}</div><div class="notif-time">${n.time}</div>`; 
-          list.appendChild(div);
-        });
-      }
+document.getElementById("image").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  const preview = document.querySelector("#imagePreview img");
+  if(file){ 
+    preview.src = URL.createObjectURL(file); 
+    document.getElementById("imagePreview").style.display="block"; 
+  } else{ 
+    document.getElementById("imagePreview").style.display="none"; 
+  }
+});
+
+let latitude="", longitude="";
+navigator.geolocation.getCurrentPosition(pos=>{
+  latitude=pos.coords.latitude;
+  longitude=pos.coords.longitude;
+  console.log('Location obtained:', latitude, longitude);
+}, (error)=>{ 
+  console.warn("Could not get location:", error);
+  // Use default Pune coordinates if location denied
+  latitude = 18.5204;
+  longitude = 73.8567;
+});
+
+// COMPLAINT FORM SUBMISSION
+const complaintForm = document.getElementById("createComplaintForm");
+complaintForm.addEventListener("submit", async e=>{
+  e.preventDefault();
+  
+  const messageDiv = document.getElementById("complaintMessage");
+  const submitBtn = complaintForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerHTML;
+  
+  // Disable submit button
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+  messageDiv.innerText = "Uploading complaint...";
+  messageDiv.className = "message";
+  
+  const formData = new FormData();
+  formData.append("title", document.getElementById("title").value);
+  formData.append("description", document.getElementById("description").value);
+  formData.append("category", document.getElementById("category").value);
+  formData.append("image", document.getElementById("image").files[0]);
+  formData.append("latitude", latitude || 18.5204);
+  formData.append("longitude", longitude || 73.8567);
+  formData.append("userEmail", userEmail);
+
+  try{
+    const res = await fetch("http://localhost:5000/report", { 
+      method:"POST", 
+      body: formData 
     });
-
-    document.getElementById("image").addEventListener("change", e=>{
-      const file = e.target.files[0];
-      const preview = document.querySelector("#imagePreview img");
-      if(file){ 
-        preview.src = URL.createObjectURL(file); 
-        document.getElementById("imagePreview").style.display="block"; 
-      } else{ 
-        document.getElementById("imagePreview").style.display="none"; 
-      }
-    });
-
-    let latitude="", longitude="";
-    navigator.geolocation.getCurrentPosition(pos=>{
-      latitude=pos.coords.latitude;
-      longitude=pos.coords.longitude;
-    }, ()=>{ console.warn("Could not get location"); });
-
-    // UPDATED: Complaint Form Submission with userEmail
-    const complaintForm = document.getElementById("createComplaintForm");
-    complaintForm.addEventListener("submit", async e=>{
-      e.preventDefault();
-      const formData = new FormData();
-      formData.append("title", document.getElementById("title").value);
-      formData.append("description", document.getElementById("description").value);
-      formData.append("category", document.getElementById("category").value);
-      formData.append("image", document.getElementById("image").files[0]);
-      formData.append("latitude", latitude);
-      formData.append("longitude", longitude);
-      formData.append("userEmail", userEmail); // ADDED: Send logged-in user email
-
-      const messageDiv = document.getElementById("complaintMessage");
-
-      try{
-        const res = await fetch("http://localhost:5000/report", { 
-          method:"POST", 
-          body: formData 
-        });
-        const data = await res.json();
-        if(res.ok){ 
-          messageDiv.innerText = data.message; 
-          messageDiv.className="message success"; 
-          complaintForm.reset(); 
-          document.getElementById("imagePreview").style.display="none";
-          setTimeout(()=>{
-            window.location.href = 'profile.html'; // Redirect to profile
-          }, 1500);
-        } else{ 
-          messageDiv.innerText = data.message||"Error submitting complaint"; 
-          messageDiv.className="message error"; 
-        }
-      } catch(err){
-        messageDiv.innerText="Failed to connect to server"; 
-        messageDiv.className="message error";
-      }
-    });
-
-    document.getElementById("createReelForm").addEventListener("submit",e=>{
-      e.preventDefault();
-      alert("Reel submitted!");
-    });
-
-    const translations={};
-    function setLanguage(lang){
-      Object.keys(translations[lang]||{}).forEach(id=>{
-        if(document.getElementById(id))
-          document.getElementById(id).innerText=translations[lang][id];
-      }); 
-      localStorage.setItem("preferredLanguage",lang);
-    }
+    const data = await res.json();
     
-    window.onload=()=>{
-      const savedLang=localStorage.getItem("preferredLanguage")||"en"; 
-      document.getElementById("langSelect").value=savedLang; 
-      setLanguage(savedLang);
+    if(res.ok){ 
+      messageDiv.innerText = "✅ " + data.message; 
+      messageDiv.className="message success"; 
+      complaintForm.reset(); 
+      document.getElementById("imagePreview").style.display="none";
+      
+      // Redirect to main page after 2 seconds
+      setTimeout(()=>{
+        window.location.href = 'main.html';
+      }, 2000);
+    } else{ 
+      messageDiv.innerText = "❌ " + (data.message||"Error submitting complaint"); 
+      messageDiv.className="message error";
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
     }
+  } catch(err){
+    console.error('Upload error:', err);
+    messageDiv.innerText="❌ Failed to connect to server. Make sure server is running on http://localhost:5000"; 
+    messageDiv.className="message error";
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
+});
+
+// REEL FORM SUBMISSION (Future feature)
+document.getElementById("createReelForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  alert("📹 Reel feature coming soon! For now, create a regular complaint.");
+});
+
+// LANGUAGE SYSTEM
+const translations={
+  en: {
+    locationText: "📍 Pune, India",
+    mainTitle: "Speak for the Streets",
+    navHome: "Home",
+    navSearch: "Search",
+    navReels: "Reels",
+    navNotifications: "Notification",
+    navCreate: "Create",
+    navProfile: "Profile",
+    navAppearance: "Switch Appearance",
+    navActivity: "Your Activity",
+    navLogout: "Log Out",
+    createHeading: "Create",
+    complaintTab: "Complaint",
+    reelTab: "Reel",
+    labelComplaintTitle: "Complaint Title",
+    labelCategory: "Category",
+    labelDescription: "Description",
+    labelUploadImage: "Upload Image",
+    btnSubmitComplaint: "Submit Complaint",
+    labelReelTitle: "Reel Title / Caption",
+    labelReelCategory: "Category / Tags",
+    labelUploadVideo: "Upload Reel Video",
+    btnSubmitReel: "Submit Reel",
+    appearanceTitle: "Switch Appearance",
+    darkModeLabel: "Dark Mode"
+  },
+  hi: {
+    locationText: "📍 पुणे, भारत",
+    mainTitle: "सड़कों के लिए बोलें",
+    navHome: "होम",
+    navSearch: "खोजें",
+    navReels: "रील्स",
+    navNotifications: "सूचनाएं",
+    navCreate: "बनाएँ",
+    navProfile: "प्रोफ़ाइल",
+    navAppearance: "दिखावट बदलें",
+    navActivity: "आपकी गतिविधि",
+    navLogout: "लॉग आउट",
+    createHeading: "बनाएँ",
+    complaintTab: "शिकायत",
+    reelTab: "रील",
+    labelComplaintTitle: "शिकायत का शीर्षक",
+    labelCategory: "श्रेणी",
+    labelDescription: "विवरण",
+    labelUploadImage: "छवि अपलोड करें",
+    btnSubmitComplaint: "शिकायत सबमिट करें",
+    labelReelTitle: "रील शीर्षक / कैप्शन",
+    labelReelCategory: "श्रेणी / टैग",
+    labelUploadVideo: "रील वीडियो अपलोड करें",
+    btnSubmitReel: "रील सबमिट करें",
+    appearanceTitle: "दिखावट बदलें",
+    darkModeLabel: "डार्क मोड"
+  },
+  mr: {
+    locationText: "📍 पुणे, भारत",
+    mainTitle: "रस्त्यांसाठी बोला",
+    navHome: "होम",
+    navSearch: "शोधा",
+    navReels: "रील्स",
+    navNotifications: "सूचना",
+    navCreate: "तयार करा",
+    navProfile: "प्रोफाइल",
+    navAppearance: "रूप बदला",
+    navActivity: "तुमची कृती",
+    navLogout: "लॉग आउट",
+    createHeading: "तयार करा",
+    complaintTab: "तक्रार",
+    reelTab: "रील",
+    labelComplaintTitle: "तक्रार शीर्षक",
+    labelCategory: "श्रेणी",
+    labelDescription: "वर्णन",
+    labelUploadImage: "प्रतिमा अपलोड करा",
+    btnSubmitComplaint: "तक्रार सबमिट करा",
+    labelReelTitle: "रील शीर्षक / कॅप्शन",
+    labelReelCategory: "श्रेणी / टॅग",
+    labelUploadVideo: "रील व्हिडिओ अपलोड करा",
+    btnSubmitReel: "रील सबमिट करा",
+    appearanceTitle: "रूप बदला",
+    darkModeLabel: "डार्क मोड"
+  }
+};
+
+function setLanguage(lang){
+  Object.keys(translations[lang]||{}).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) {
+      if(el.tagName === 'INPUT' || el.tagName === 'BUTTON') {
+        el.value = translations[lang][id];
+      } else {
+        el.innerText = translations[lang][id];
+      }
+    }
+  }); 
+  localStorage.setItem("preferredLanguage",lang);
+}
+
+window.onload=()=>{
+  const savedLang=localStorage.getItem("preferredLanguage")||"en"; 
+  document.getElementById("langSelect").value=savedLang; 
+  setLanguage(savedLang);
+}
   </script>
 </body>
 </html>
