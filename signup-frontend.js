@@ -1,52 +1,61 @@
-// Updated signin-frontend.js with proper session management
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("signupForm");
+  const message = document.getElementById("message");
 
-const form = document.querySelector("form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+    // Collect form data
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
 
-  const email = form.username.value.trim();  
-  const password = form.password.value;
-
-  if (!email || !password) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  // Disable submit button during request
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const originalText = submitBtn.innerHTML;
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-
-  try {
-    const response = await fetch("http://localhost:5000/signin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }), 
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      // Save user session
-      localStorage.setItem('userEmail', data.email);
-      localStorage.setItem('userFullname', data.fullname || 'Anonymous');
-      localStorage.setItem('loginTime', new Date().toISOString());
-      
-      alert('✅ ' + data.message);
-      
-      // Redirect to main page
-      window.location.href = "main.html";
-    } else {
-      alert('❌ ' + data.message);
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
+    // Frontend validation
+    if (!name || !email || !password || !confirmPassword) {
+      return showMessage("Please fill in all fields", "red");
     }
-  } catch (error) {
-    console.error('Signin error:', error);
-    alert("❌ Signin failed. Please make sure the server is running on http://localhost:5000");
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalText;
+
+    if (password !== confirmPassword) {
+      return showMessage("Passwords do not match", "red");
+    }
+
+    if (password.length < 6) {
+      return showMessage("Password must be at least 6 characters", "red");
+    }
+
+    try {
+      // Send data to backend
+      const res = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showMessage("Signup successful! Redirecting...", "green");
+        form.reset();
+
+        // Redirect after a short delay (optional)
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1500);
+      } else {
+        showMessage(data.message || "Signup failed. Try again.", "red");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      showMessage("Server error. Please try again later.", "red");
+    }
+  });
+
+  // Helper function to show messages
+  function showMessage(msg, color) {
+    message.textContent = msg;
+    message.style.color = color;
   }
 });
