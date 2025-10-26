@@ -4,42 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up - Speak for the Streets</title>
-
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .language-switcher select {
-      border: none;
-      background-color: transparent;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+    body { font-family: 'Inter', sans-serif; }
+    .role-card { transition: all 0.3s ease; cursor: pointer; }
+    .role-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    .role-card.selected { border: 3px solid #3b82f6; background: #eff6ff; }
+    #workerFields { display: none; }
   </style>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen relative">
 
-  <!-- 🌐 Language Switcher -->
-  <div class="absolute top-6 right-6 language-switcher">
-    <select id="langSelect" onchange="setLanguage(this.value)" class="bg-gray-800 border border-gray-600 rounded px-3 py-1 shadow">
+  <!-- Language Switcher -->
+  <div class="absolute top-6 right-6">
+    <select id="langSelect" onchange="setLanguage(this.value)" class="bg-gray-800 border border-gray-600 rounded px-3 py-1">
       <option value="en">🌐 English</option>
       <option value="hi">🇮🇳 हिंदी</option>
       <option value="mr">🌿 मराठी</option>
     </select>
   </div>
 
-  <!-- 📋 Signup Card -->
-  <div class="bg-gray-800 rounded-2xl shadow-xl p-10 w-full max-w-md">
+  <!-- Signup Card -->
+  <div class="bg-gray-800 rounded-2xl shadow-xl p-10 w-full max-w-2xl">
     <h2 id="signupTitle" class="text-3xl font-bold text-center mb-6">Create an Account</h2>
 
-    <form action="main.html" method="POST" class="space-y-5">
+    <!-- Role Selection -->
+    <div class="mb-6">
+      <label class="block mb-3 text-lg font-medium">Select Your Role:</label>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="role-card bg-gray-700 p-4 rounded-lg text-center" onclick="selectRole('citizen')">
+          <i class="fas fa-user text-4xl text-blue-400 mb-2"></i>
+          <h3 class="font-semibold text-lg">Citizen</h3>
+          <p class="text-sm text-gray-400">Report civic issues</p>
+        </div>
+        <div class="role-card bg-gray-700 p-4 rounded-lg text-center" onclick="selectRole('worker')">
+          <i class="fas fa-user-tie text-4xl text-green-400 mb-2"></i>
+          <h3 class="font-semibold text-lg">Worker</h3>
+          <p class="text-sm text-gray-400">Resolve issues</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="signupForm" class="space-y-4">
+      <input type="hidden" id="role" name="role" value="citizen">
+      
       <!-- Full Name -->
       <div>
         <label id="fullnameLabel" class="block mb-1 text-sm font-medium">Full Name</label>
@@ -52,6 +62,21 @@
         <label id="emailLabel" class="block mb-1 text-sm font-medium">Email</label>
         <input type="email" name="email" required
                class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <!-- Phone Number -->
+      <div>
+        <label id="phoneLabel" class="block mb-1 text-sm font-medium">Phone Number</label>
+        <input type="tel" name="phoneNumber" 
+               class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <!-- Worker-specific fields -->
+      <div id="workerFields">
+        <label id="orgLabel" class="block mb-1 text-sm font-medium">Organization / Agency</label>
+        <input type="text" name="organization" id="organizationInput"
+               class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500" 
+               placeholder="e.g., Municipal Corporation, NGO, etc." />
       </div>
 
       <!-- Password -->
@@ -68,11 +93,13 @@
                class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
-      <!-- Sign Up Button -->
+      <!-- Submit Button -->
       <button id="signupBtn" type="submit"
-              class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold">
-        Sign Up
+              class="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold text-lg">
+        <i class="fas fa-user-plus"></i> Sign Up
       </button>
+      
+      <div id="message" class="text-center mt-3"></div>
     </form>
 
     <!-- Redirect to Sign In -->
@@ -82,13 +109,91 @@
     </p>
   </div>
 
-  <!-- 🌍 Multilingual Script -->
   <script>
+    let selectedRole = 'citizen';
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById('role').value = role;
+      
+      // Update UI
+      document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+      
+      // Show/hide worker fields
+      const workerFields = document.getElementById('workerFields');
+      const orgInput = document.getElementById('organizationInput');
+      
+      if (role === 'worker') {
+        workerFields.style.display = 'block';
+        orgInput.required = true;
+      } else {
+        workerFields.style.display = 'none';
+        orgInput.required = false;
+      }
+    }
+
+    // Form submission
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const data = {
+        fullname: formData.get('fullname'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        confirmPassword: formData.get('confirmPassword'),
+        phoneNumber: formData.get('phoneNumber'),
+        role: selectedRole,
+        organization: formData.get('organization') || ''
+      };
+      
+      const messageDiv = document.getElementById('message');
+      const submitBtn = document.getElementById('signupBtn');
+      
+      // Validate passwords
+      if (data.password !== data.confirmPassword) {
+        messageDiv.innerHTML = '<span class="text-red-500">❌ Passwords do not match</span>';
+        return;
+      }
+      
+      // Disable button
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+      
+      try {
+        const response = await fetch('http://localhost:5000/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          messageDiv.innerHTML = '<span class="text-green-500">✅ ' + result.message + '</span>';
+          setTimeout(() => window.location.href = 'signin.html', 2000);
+        } else {
+          messageDiv.innerHTML = '<span class="text-red-500">❌ ' + result.message + '</span>';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Sign Up';
+        }
+      } catch (error) {
+        console.error('Signup error:', error);
+        messageDiv.innerHTML = '<span class="text-red-500">❌ Connection error. Make sure server is running.</span>';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Sign Up';
+      }
+    });
+
+    // Translations
     const translations = {
       en: {
         signupTitle: "Create an Account",
         fullnameLabel: "Full Name",
         emailLabel: "Email",
+        phoneLabel: "Phone Number",
+        orgLabel: "Organization / Agency",
         passwordLabel: "Password",
         confirmPasswordLabel: "Confirm Password",
         signupBtn: "Sign Up",
@@ -99,6 +204,8 @@
         signupTitle: "खाता बनाएँ",
         fullnameLabel: "पूरा नाम",
         emailLabel: "ईमेल",
+        phoneLabel: "फ़ोन नंबर",
+        orgLabel: "संगठन / एजेंसी",
         passwordLabel: "पासवर्ड",
         confirmPasswordLabel: "पासवर्ड की पुष्टि करें",
         signupBtn: "साइन अप करें",
@@ -109,6 +216,8 @@
         signupTitle: "खाते तयार करा",
         fullnameLabel: "पूर्ण नाव",
         emailLabel: "ईमेल",
+        phoneLabel: "फोन नंबर",
+        orgLabel: "संस्था / एजन्सी",
         passwordLabel: "पासवर्ड",
         confirmPasswordLabel: "पासवर्ड पुष्टी करा",
         signupBtn: "नोंदणी करा",
@@ -118,24 +227,21 @@
     };
 
     function setLanguage(lang) {
-      document.getElementById("signupTitle").innerText = translations[lang].signupTitle;
-      document.getElementById("fullnameLabel").innerText = translations[lang].fullnameLabel;
-      document.getElementById("emailLabel").innerText = translations[lang].emailLabel;
-      document.getElementById("passwordLabel").innerText = translations[lang].passwordLabel;
-      document.getElementById("confirmPasswordLabel").innerText = translations[lang].confirmPasswordLabel;
-      document.getElementById("signupBtn").innerText = translations[lang].signupBtn;
-      document.getElementById("alreadyAccountText").innerText = translations[lang].alreadyAccountText;
-      document.getElementById("signinLink").innerText = translations[lang].signinLink;
+      Object.keys(translations[lang]).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) el.innerText = translations[lang][key];
+      });
       localStorage.setItem("preferredLanguage", lang);
     }
 
-    // Load saved language on page load
     window.onload = () => {
       const savedLang = localStorage.getItem("preferredLanguage") || "en";
       document.getElementById("langSelect").value = savedLang;
       setLanguage(savedLang);
+      
+      // Set default role selection
+      document.querySelector('.role-card').classList.add('selected');
     };
   </script>
-<script src="signup-frontend.js"></script>
 </body>
 </html>
