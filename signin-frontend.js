@@ -1,4 +1,4 @@
-// Updated signin-frontend.js with proper session management
+// Enhanced signin-frontend.js with role management
 
 const form = document.querySelector("form");
 
@@ -13,7 +13,6 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Disable submit button during request
   const submitBtn = form.querySelector('button[type="submit"]');
   const originalText = submitBtn.innerHTML;
   submitBtn.disabled = true;
@@ -29,12 +28,19 @@ form.addEventListener("submit", async (e) => {
     const data = await response.json();
 
     if (response.ok) {
-      // Save user session
+      // Save complete user session with role
       localStorage.setItem('userEmail', data.email);
       localStorage.setItem('userFullname', data.fullname || 'Anonymous');
+      localStorage.setItem('userRole', data.role || 'citizen');
+      localStorage.setItem('userOrganization', data.organization || '');
       localStorage.setItem('loginTime', new Date().toISOString());
       
-      alert('✅ ' + data.message);
+      // Show role-specific success message
+      const roleMessage = data.role === 'worker' 
+        ? 'Welcome back! You can now manage and resolve complaints.' 
+        : 'Welcome back! You can now report and track civic issues.';
+      
+      alert(`✅ ${data.message}\n${roleMessage}`);
       
       // Redirect to main page
       window.location.href = "main.html";
