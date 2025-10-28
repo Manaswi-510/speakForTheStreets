@@ -3,54 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Profile</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>User Profile - Speak for the Streets</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    .profile-container {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: #000;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    /* Main Container */
+    .container {
+      display: flex;
+      margin-top: 20px;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #1a1a2e;
+      padding: 20px;
+      color: white;
+    }
+
+    .sidebar a {
       display: flex;
       align-items: center;
-      gap: 30px;
-      padding: 20px;
-      background-color: white;
+      gap: 10px;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover {
+      background: #2a2a4e;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .profile-container {
+      background: white;
       border-radius: 12px;
+      padding: 30px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      display: flex;
+      gap: 30px;
+      align-items: center;
     }
 
     .profile-photo {
       width: 120px;
       height: 120px;
-      background-color: #ddd;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 60px;
-      color: #888;
+      color: white;
+      flex-shrink: 0;
     }
 
-    .profile-info input {
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-info h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .info-group {
+      margin-bottom: 15px;
+    }
+
+    .info-group label {
       display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .info-group input {
       width: 100%;
-      max-width: 300px;
-      padding: 8px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      max-width: 400px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .info-display {
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      color: #666;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: #27ae60;
+    }
+
+    /* Posts Section */
+    .posts-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .posts-section h3 {
+      margin-bottom: 20px;
+      font-size: 20px;
     }
 
     .posts-grid {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
     }
 
     .post-box {
-      width: 200px;
-      height: 250px;
-      background-color: #eee;
+      aspect-ratio: 4/5;
+      background: #f0f0f0;
       border-radius: 10px;
       overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .post-box:hover {
+      transform: scale(1.05);
     }
 
     .post-box img {
@@ -59,42 +193,75 @@
       object-fit: cover;
     }
 
-    .btn {
-      padding: 10px 16px;
-      background-color: #1a1a2e;
+    .logout-btn {
+      background: #dc3545;
       color: white;
       border: none;
+      padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #c82333;
+    }
+
+    .user-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #e8f5e9;
+      color: #4caf50;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .user-badge.worker {
+      background: #e3f2fd;
+      color: #2196f3;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: #ddd;
     }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
-  <header class="header-bar" style="background-color: black; color: white; padding: 10px 20px; display: flex; justify-content: space-between;">
-    <div class="left-info">
-      <p>Speak For Your Streets</p>
-    </div>
-    <div class="right-icons">
-      <i class="notification.html" title="Notifications"></i>
-      <i class="fas fa-circle-user" title="Profile"></i>
+  <header>
+    <div class="header-title">Speak for the Streets</div>
+    <div class="header-right">
+      <span id="userNameDisplay">Loading...</span>
+      <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
     </div>
   </header>
 
   <!-- CONTAINER -->
-  <div style="display: flex; margin-top: 20px;">
+  <div class="container">
 
     <!-- SIDEBAR -->
-    <nav style="width: 220px; background: #1a1a2e; border-radius: 10px; padding: 20px; color: white; height: 100vh;">
-      <ul style="list-style: none; padding-left: 0;">
-        <a href="http://127.0.0.1:5500/main.html"><i class="fas fa-home"></i> Home</a>
-        <li><i class="fas fa-sign-out-alt"></i> Logout</li>
-      </ul>
+    <nav class="sidebar">
+      <a href="main.html"><i class="fas fa-home"></i> Home</a>
+      <a href="create.html"><i class="fas fa-plus"></i> Create</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="reels.html"><i class="fas fa-video"></i> Reels</a>
+      <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </nav>
 
-    <!-- PROFILE SECTION -->
-    <main style="flex: 1; margin-left: 20px;">
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
 
       <!-- USER INFO -->
       <section class="profile-container">
@@ -102,38 +269,149 @@
           <i class="fas fa-user"></i>
         </div>
         <div class="profile-info">
-          <h2>Anonymous</h2>
-          <label>Address:</label>
-          <input type="text" placeholder="Enter address" />
+          <h2 id="userName">Loading...</h2>
+          
+          <div class="info-group">
+            <label>Email:</label>
+            <div class="info-display" id="userEmail">Loading...</div>
+          </div>
 
-          <label>City:</label>
-          <input type="text" placeholder="Enter city" />
+          <div class="info-group">
+            <label>Role:</label>
+            <div class="info-display" id="userRole">Loading...</div>
+          </div>
 
-          <button class="btn">Save</button>
+          <div class="info-group" id="organizationGroup" style="display: none;">
+            <label>Organization:</label>
+            <div class="info-display" id="userOrganization">N/A</div>
+          </div>
+
+          <div class="info-group">
+            <label>Member Since:</label>
+            <div class="info-display" id="memberSince">Loading...</div>
+          </div>
         </div>
       </section>
 
       <!-- POSTS -->
-      <section style="margin-top: 30px;">
-        <h3 style="margin-bottom: 10px;">Posts & Reels</h3>
-        <div class="posts-grid">
-          <div class="post-box">
-            <img src="https://via.placeholder.com/200x250" alt="Post" />
+      <section class="posts-section">
+        <h3><i class="fas fa-images"></i> My Reports & Complaints</h3>
+        <div class="posts-grid" id="userPostsGrid">
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Loading your reports...</p>
           </div>
-          <div class="post-box">
-            <img src="https://via.placeholder.com/200x250" alt="Post" />
-          </div>
-          <div class="post-box">
-            <img src="https://via.placeholder.com/200x250" alt="Post" />
-          </div>
-          <!-- Add more if needed -->
         </div>
       </section>
 
     </main>
   </div>
+
+  <!-- Load preferences.js first -->
   <script src="prefrences.js"></script>
 
+  <script>
+    // Check authentication
+    const userEmail = localStorage.getItem('userEmail');
+    const userFullname = localStorage.getItem('userFullname');
+    const userRole = localStorage.getItem('userRole');
+    const userOrganization = localStorage.getItem('userOrganization');
+    const loginTime = localStorage.getItem('loginTime');
+
+    // If not logged in, redirect to signin
+    if (!userEmail) {
+      alert('Please sign in first!');
+      window.location.href = 'signin.html';
+    }
+
+    // Display user information
+    document.getElementById('userName').textContent = userFullname || 'Anonymous User';
+    document.getElementById('userNameDisplay').textContent = userFullname || 'User';
+    document.getElementById('userEmail').textContent = userEmail;
+    
+    // Display role with badge
+    const roleDisplay = document.getElementById('userRole');
+    const roleName = userRole === 'worker' ? 'Worker' : 'Citizen';
+    const badgeClass = userRole === 'worker' ? 'worker' : '';
+    roleDisplay.innerHTML = `${roleName} <span class="user-badge ${badgeClass}">${roleName.toUpperCase()}</span>`;
+
+    // Show organization if worker
+    if (userRole === 'worker' && userOrganization) {
+      document.getElementById('organizationGroup').style.display = 'block';
+      document.getElementById('userOrganization').textContent = userOrganization;
+    }
+
+    // Display member since date
+    if (loginTime) {
+      const date = new Date(loginTime);
+      document.getElementById('memberSince').textContent = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Load user's reports
+    async function loadUserReports() {
+      try {
+        const response = await fetch(`http://localhost:5000/userReports/${encodeURIComponent(userEmail)}`);
+        const reports = await response.json();
+        
+        const grid = document.getElementById('userPostsGrid');
+        
+        if (reports.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>You haven't posted any reports yet.</p>
+              <a href="create.html" class="btn" style="display: inline-block; text-decoration: none; margin-top: 10px;">
+                <i class="fas fa-plus"></i> Create First Report
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = reports.map(report => `
+          <div class="post-box" onclick="viewReport('${report._id}')">
+            <img src="http://localhost:5000/uploads/${report.image}" 
+                 alt="${report.title}"
+                 onerror="this.src='https://via.placeholder.com/200x250?text=Image+Not+Found'">
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error('Error loading user reports:', error);
+        document.getElementById('userPostsGrid').innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Failed to load reports. Please make sure the server is running.</p>
+          </div>
+        `;
+      }
+    }
+
+    function viewReport(reportId) {
+      window.location.href = `main.html#report-${reportId}`;
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // Clear all user data
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userFullname');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userOrganization');
+        localStorage.removeItem('loginTime');
+        
+        alert('Logged out successfully!');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Load reports on page load
+    loadUserReports();
+  </script>
 
 </body>
 </html>
