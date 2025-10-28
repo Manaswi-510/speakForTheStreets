@@ -1,14 +1,12 @@
-// Enhanced complaints.js with worker features and anonymous comments
+// complaints.js - Loads and displays complaints on timeline
 
 const userEmail = localStorage.getItem('userEmail') || 'anonymous@user.com';
-const userRole = localStorage.getItem('userRole') || 'citizen';
-const userName = localStorage.getItem('userFullname') || 'Anonymous';
 
 // Status color mapping
 const statusColors = {
-  'unsolved': '#ef4444',
-  'in-progress': '#f59e0b',
-  'solved': '#10b981'
+  'unsolved': '#ef4444',      // Red
+  'in-progress': '#f59e0b',   // Yellow/Orange
+  'solved': '#10b981'         // Green
 };
 
 const statusIcons = {
@@ -17,16 +15,29 @@ const statusIcons = {
   'solved': '🟢'
 };
 
-// Load complaints based on user role
+// Load all complaints on page load
 async function loadComplaints() {
   try {
-    const response = await fetch(`http://localhost:5000/reports?userRole=${userRole}`);
+    const response = await fetch('http://localhost:5000/reports');
     const reports = await response.json();
     
     displayComplaints(reports);
   } catch (error) {
     console.error('Error loading complaints:', error);
     showError('Failed to load complaints. Make sure the server is running.');
+  }
+}
+
+// Load nearby complaints based on user location
+async function loadNearbyComplaints(lat, lng, radius = 5) {
+  try {
+    const response = await fetch(`http://localhost:5000/nearbyReports?lat=${lat}&lng=${lng}&radius=${radius}`);
+    const reports = await response.json();
+    
+    displayComplaints(reports);
+  } catch (error) {
+    console.error('Error loading nearby complaints:', error);
+    showError('Failed to load nearby complaints.');
   }
 }
 
@@ -45,7 +56,7 @@ function displayComplaints(reports) {
     container.innerHTML = `
       <div style="text-align: center; padding: 40px; color: #666;">
         <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px;"></i>
-        <p style="font-size: 18px;">No complaints found yet.</p>
+        <p style="font-size: 18px;">No complaints found in your area yet.</p>
         <p>Be the first to report an issue!</p>
       </div>
     `;
@@ -53,6 +64,8 @@ function displayComplaints(reports) {
   }
 
   container.innerHTML = reports.map(report => createComplaintCard(report)).join('');
+  
+  // Attach event listeners after rendering
   attachComplaintEventListeners();
 }
 
@@ -70,10 +83,6 @@ function createComplaintCard(report) {
     'electricity': '⚡'
   };
 
-  const isOwner = report.userEmail === userEmail;
-  const isWorker = userRole === 'worker';
-  const isAssignedWorker = report.assignedTo === userEmail;
-
   return `
     <div class="complaint-card" data-id="${report._id}" style="border-left: 5px solid ${statusColor};">
       <div class="complaint-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -84,7 +93,6 @@ function createComplaintCard(report) {
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 18px;" title="${report.status}">${statusIcon}</span>
           <span style="font-size: 12px; color: #888;">${timeAgo}</span>
-          ${isOwner ? `<button onclick="deleteComplaint('${report._id}')" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
         </div>
       </div>
 
@@ -94,21 +102,14 @@ function createComplaintCard(report) {
         <h3 style="margin: 10px 0; font-size: 18px;">${escapeHtml(report.title)}</h3>
         <p style="color: #555; font-size: 14px; line-height: 1.5;">${escapeHtml(report.description)}</p>
         
-        ${report.issueLatitude && report.issueLongitude ? `
+        ${report.latitude && report.longitude ? `
           <div style="margin-top: 8px; font-size: 12px; color: #888;">
-            📍 Issue Location: ${report.issueLatitude.toFixed(4)}, ${report.issueLongitude.toFixed(4)}
-            <a href="https://www.google.com/maps?q=${report.issueLatitude},${report.issueLongitude}" 
+            📍 Location: ${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}
+            <a href="https://www.google.com/maps?q=${report.latitude},${report.longitude}" 
                target="_blank" 
                style="color: #007bff; margin-left: 8px;">
-              <i class="fas fa-map-marker-alt"></i> View on Map
+              View on Map
             </a>
-            ${report.hasGeoTag ? '<span style="color: #28a745; margin-left: 8px;"><i class="fas fa-check-circle"></i> Geo-verified</span>' : ''}
-          </div>
-        ` : ''}
-
-        ${report.assignedTo ? `
-          <div style="margin-top: 8px; padding: 8px; background: #e8f5e9; border-radius: 6px; font-size: 13px;">
-            <i class="fas fa-user-tie" style="color: #4caf50;"></i> Assigned to: <strong>${isAssignedWorker ? 'You' : 'Worker'}</strong>
           </div>
         ` : ''}
 
@@ -133,25 +134,6 @@ function createComplaintCard(report) {
               ⚠️ ESCALATED
             </span>
           ` : ''}
-
-          ${isWorker && !report.assignedTo ? `
-            <button onclick="takeComplaint('${report._id}')" style="background: #9c27b0; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600;">
-              <i class="fas fa-hand-paper"></i> Take This Task
-            </button>
-          ` : ''}
-
-          ${isWorker && isAssignedWorker ? `
-            <div style="display: flex; gap: 8px;">
-              <button onclick="updateStatus('${report._id}', 'in-progress')" 
-                      style="background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; ${report.status === 'in-progress' ? 'opacity: 0.5;' : ''}">
-                🟡 In Progress
-              </button>
-              <button onclick="updateStatus('${report._id}', 'solved')" 
-                      style="background: #4caf50; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; ${report.status === 'solved' ? 'opacity: 0.5;' : ''}">
-                🟢 Mark Solved
-              </button>
-            </div>
-          ` : ''}
         </div>
 
         <!-- Comments Section -->
@@ -160,7 +142,7 @@ function createComplaintCard(report) {
             ${report.comments.map(comment => `
               <div style="background: #f5f5f5; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;">
                 <div style="font-size: 12px; color: #888; margin-bottom: 4px;">
-                  ${comment.isWorker ? '<i class="fas fa-user-tie" style="color: #4caf50;"></i> Worker' : '👤 Anonymous Citizen'} • ${getTimeAgo(comment.createdAt)}
+                  👤 ${comment.userEmail.split('@')[0]} • ${getTimeAgo(comment.createdAt)}
                 </div>
                 <div style="font-size: 14px;">${escapeHtml(comment.text)}</div>
               </div>
@@ -171,7 +153,7 @@ function createComplaintCard(report) {
             <input type="text" 
                    class="comment-input" 
                    id="comment-input-${report._id}" 
-                   placeholder="Add a comment (anonymous)..."
+                   placeholder="Add a comment..."
                    style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px;">
             <button onclick="addComment('${report._id}')" 
                     style="background: #2ecc71; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">
@@ -184,7 +166,7 @@ function createComplaintCard(report) {
   `;
 }
 
-// Attach event listeners
+// Attach event listeners to vote buttons
 function attachComplaintEventListeners() {
   document.querySelectorAll('.vote-btn').forEach(btn => {
     if (!btn.classList.contains('comment') && !btn.classList.contains('share')) {
@@ -196,7 +178,7 @@ function attachComplaintEventListeners() {
   });
 }
 
-// Vote on complaint
+// Vote on a complaint
 async function voteOnComplaint(reportId, buttonElement) {
   try {
     const response = await fetch(`http://localhost:5000/vote/${reportId}`, {
@@ -208,15 +190,18 @@ async function voteOnComplaint(reportId, buttonElement) {
     const data = await response.json();
 
     if (response.ok) {
+      // Update vote count
       const voteCountElement = buttonElement.querySelector('.vote-count');
       voteCountElement.textContent = data.votes;
       
+      // Disable button and change style
       buttonElement.style.background = '#888';
       buttonElement.innerHTML = `<i class="fas fa-check"></i> <span class="vote-count">${data.votes}</span> Voted`;
       buttonElement.disabled = true;
 
       if (data.escalated) {
         alert('✅ This complaint has been escalated to authorities!');
+        // Reload to show escalation badge
         loadComplaints();
       }
     } else {
@@ -228,80 +213,7 @@ async function voteOnComplaint(reportId, buttonElement) {
   }
 }
 
-// Worker takes complaint
-async function takeComplaint(reportId) {
-  if (!confirm('Are you sure you want to take this task?')) return;
-
-  try {
-    const response = await fetch(`http://localhost:5000/report/${reportId}/assign`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workerEmail: userEmail })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert('✅ Task assigned to you successfully!');
-      loadComplaints();
-    } else {
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error('Assign error:', error);
-    alert('Failed to assign task. Please try again.');
-  }
-}
-
-// Update complaint status (workers only)
-async function updateStatus(reportId, status) {
-  try {
-    const response = await fetch(`http://localhost:5000/report/${reportId}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status, workerEmail: userEmail })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert(`✅ Status updated to: ${status}`);
-      loadComplaints();
-    } else {
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error('Status update error:', error);
-    alert('Failed to update status. Please try again.');
-  }
-}
-
-// Delete complaint (owner only)
-async function deleteComplaint(reportId) {
-  if (!confirm('Are you sure you want to delete this complaint?')) return;
-
-  try {
-    const response = await fetch(`http://localhost:5000/report/${reportId}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert('✅ Complaint deleted successfully');
-      loadComplaints();
-    } else {
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error('Delete error:', error);
-    alert('Failed to delete complaint. Please try again.');
-  }
-}
-
-// Toggle comments
+// Toggle comments section
 function toggleComments(reportId) {
   const commentsSection = document.getElementById(`comments-${reportId}`);
   if (commentsSection.style.display === 'none') {
@@ -311,7 +223,7 @@ function toggleComments(reportId) {
   }
 }
 
-// Add comment (anonymous)
+// Add a comment
 async function addComment(reportId) {
   const inputElement = document.getElementById(`comment-input-${reportId}`);
   const text = inputElement.value.trim();
@@ -325,17 +237,14 @@ async function addComment(reportId) {
     const response = await fetch(`http://localhost:5000/comment/${reportId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userEmail, 
-        text,
-        isWorker: userRole === 'worker'
-      })
+      body: JSON.stringify({ userEmail, text })
     });
 
     const data = await response.json();
 
     if (response.ok) {
       inputElement.value = '';
+      // Reload complaints to show new comment
       loadComplaints();
     } else {
       alert(data.message);
@@ -357,9 +266,11 @@ function shareComplaint(reportId) {
       url: shareUrl
     }).catch(err => console.log('Share failed:', err));
   } else {
+    // Fallback - copy to clipboard
     navigator.clipboard.writeText(shareUrl).then(() => {
-      alert('✅ Link copied to clipboard!');
+      alert('Link copied to clipboard!');
     }).catch(err => {
+      console.error('Copy failed:', err);
       alert('Share link: ' + shareUrl);
     });
   }
@@ -382,7 +293,7 @@ async function searchComplaints(query) {
   }
 }
 
-// Utility functions
+// Utility: Get time ago string
 function getTimeAgo(dateString) {
   const date = new Date(dateString);
   const now = new Date();
@@ -395,12 +306,14 @@ function getTimeAgo(dateString) {
   return date.toLocaleDateString();
 }
 
+// Utility: Escape HTML to prevent XSS
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
+// Show error message
 function showError(message) {
   const container = document.getElementById('postsContainer') || 
                     document.getElementById('complaint-container') || 
@@ -418,7 +331,22 @@ function showError(message) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  loadComplaints();
+  // Try to get user location and load nearby complaints
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        loadNearbyComplaints(lat, lng, 10); // 10km radius
+      },
+      (error) => {
+        console.log('Location access denied, loading all complaints');
+        loadComplaints();
+      }
+    );
+  } else {
+    loadComplaints();
+  }
 
   // Setup search functionality
   const searchBtn = document.getElementById('searchBtn');
@@ -437,14 +365,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Export functions
+// Export functions for use in other scripts
 if (typeof window !== 'undefined') {
   window.loadComplaints = loadComplaints;
+  window.loadNearbyComplaints = loadNearbyComplaints;
   window.toggleComments = toggleComments;
   window.addComment = addComment;
   window.shareComplaint = shareComplaint;
   window.searchComplaints = searchComplaints;
-  window.takeComplaint = takeComplaint;
-  window.updateStatus = updateStatus;
-  window.deleteComplaint = deleteComplaint;
 }
