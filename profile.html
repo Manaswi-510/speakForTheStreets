@@ -124,35 +124,11 @@
       color: #555;
     }
 
-    .info-group input {
-      width: 100%;
-      max-width: 400px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
     .info-display {
       padding: 10px;
       background: #f8f9fa;
       border-radius: 8px;
       color: #666;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      background: #2ecc71;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 15px;
-    }
-
-    .btn:hover {
-      background: #27ae60;
     }
 
     /* Posts Section */
@@ -307,22 +283,24 @@
     </main>
   </div>
 
-  <!-- Load preferences.js first -->
-  <script src="prefrences.js"></script>
-
   <script>
-    // Check authentication
+    // ✅ FIX: Check authentication FIRST before anything else
+    (function checkAuthentication() {
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!userEmail) {
+        alert('Please sign in first!');
+        window.location.href = 'signin.html';
+        return; // Stop execution
+      }
+    })();
+
+    // Now load user data
     const userEmail = localStorage.getItem('userEmail');
     const userFullname = localStorage.getItem('userFullname');
     const userRole = localStorage.getItem('userRole');
     const userOrganization = localStorage.getItem('userOrganization');
     const loginTime = localStorage.getItem('loginTime');
-
-    // If not logged in, redirect to signin
-    if (!userEmail) {
-      alert('Please sign in first!');
-      window.location.href = 'signin.html';
-    }
 
     // Display user information
     document.getElementById('userName').textContent = userFullname || 'Anonymous User';
@@ -364,7 +342,7 @@
             <div class="empty-state">
               <i class="fas fa-inbox"></i>
               <p>You haven't posted any reports yet.</p>
-              <a href="create.html" class="btn" style="display: inline-block; text-decoration: none; margin-top: 10px;">
+              <a href="create.html" style="display: inline-block; text-decoration: none; margin-top: 10px; background: #2ecc71; color: white; padding: 10px 20px; border-radius: 8px;">
                 <i class="fas fa-plus"></i> Create First Report
               </a>
             </div>
