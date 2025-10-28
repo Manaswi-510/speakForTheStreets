@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create - Speak for the Streets</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <style>
     :root {
       --primary-color: #111;
@@ -21,42 +20,41 @@
     .header-right{display:flex;align-items:center;gap:1rem;}
     .language-switcher select{background:#000;color:white;border:1px solid #444;padding:4px 8px;border-radius:5px;cursor:pointer;}
 
-    .sidebar { position:fixed; left:0; top:4rem; width:250px; height:calc(100% - 4rem); background:#000; color:white; display:flex; flex-direction:column; padding:1rem; gap:1rem; z-index:1500; overflow-y:auto; }
+    .sidebar { position:fixed; left:0; top:4rem; width:250px; height:calc(100% - 4rem); background:#000; color:white; display:flex; flex-direction:column; padding:1rem; gap:1rem; z-index:1500; }
     .sidebar a{color:white;text-decoration:none;display:flex;align-items:center;gap:0.5rem;font-size:1.1rem;}
 
+    #searchBox{display:none;margin-top:10px;padding:12px;background:#111;border-radius:8px;width:95%;}
+    #sidebarSearchInput{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:8px;}
+    #searchBtn{padding:8px;width:100%;border:none;border-radius:6px;background:#2ecc71;color:white;cursor:pointer;display:flex;justify-content:center;gap:6px;}
+    #closeSearch{position:absolute;top:6px;right:10px;background:transparent;border:none;font-size:20px;font-weight:bold;cursor:pointer;color:black;}
+
+    .appearance-popup{display:none;position:absolute;right:1rem;top:4rem;background:var(--secondary-color);color:var(--primary-color);border:1px solid #ccc;border-radius:10px;padding:1rem;z-index:2000;width:220px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+    .appearance-popup .close-btn{position:absolute;top:6px;right:10px;background:transparent;border:none;font-size:18px;font-weight:bold;cursor:pointer;color:var(--primary-color);}
+    body.dark .appearance-popup{background:#222;color:#fff;border:1px solid #555;}
+    .dark-mode-toggle{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+
+    .notification-sidebar{position:fixed;top:4rem;left:0;width:320px;height:calc(100% - 4rem);background:#111;color:white;padding:1rem;transform:translateX(-100%);transition:transform 0.3s ease;z-index:2000;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.4);}
+    .notification-sidebar.show{transform:translateX(0);}
+    .notif-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+    .notification-item{background:#1a1a1a;border-radius:10px;padding:10px;margin-bottom:10px;cursor:pointer;transition:background 0.2s;}
+    .notification-item:hover{background:#2a2a2a;}
+    .notif-type{font-size:0.9rem;color:#2ecc71;} .notif-message{font-size:1rem;} .notif-time{font-size:0.8rem;color:#aaa;text-align:right;}
+
     .main-content{margin-left:260px;padding:2rem;}
-    
-    form{display:flex;flex-direction:column;gap:1rem;max-width:600px;}
+    .tabs{display:flex;gap:1rem;margin-bottom:1rem;}
+    .tab-button{background:#ccc;padding:10px 20px;border-radius:5px;cursor:pointer;}
+    .tab-button.active{background:#2ecc71;color:white;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    form{display:flex;flex-direction:column;gap:1rem;max-width:500px;}
     input,textarea,select{padding:10px;border:1px solid #ccc;border-radius:6px;}
-    button{background:#2ecc71;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:600;}
+    button{background:#2ecc71;color:white;border:none;padding:10px;border-radius:6px;cursor:pointer;}
     button:hover{background:#27ae60;}
-    button:disabled{background:#95a5a6;cursor:not-allowed;}
-    
-    .preview{margin-top:1rem;display:none;} 
-    .preview img{max-width:100%;border-radius:10px;}
-    
-    .message { font-weight:500; margin-top:10px; padding:10px; border-radius:6px; }
-    .message.success { color: #28a745; background:#d4edda; }
-    .message.error { color: #dc3545; background:#f8d7da; }
-    .message.warning { color: #856404; background:#fff3cd; }
-    
-    .geo-info {
-      background: #e8f5e9;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 10px;
-      display: none;
-    }
-    
-    .geo-info.error {
-      background: #ffebee;
-      color: #c62828;
-    }
-    
-    .geo-info.success {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
+    .preview{margin-top:1rem;display:none;} .preview img,.preview video{max-width:100%;border-radius:10px;}
+    .message { font-weight:500; margin-top:10px; }
+    .message.success { color: #28a745; }
+    .message.error { color: #dc3545; }
   </style>
 </head>
 <body>
@@ -76,170 +74,181 @@
 
   <div class="sidebar">
     <a href="main.html"><i class="fas fa-home"></i> <span id="navHome">Home</span></a>
+    <a href="#" id="searchTab"><i class="fas fa-search"></i> <span id="navSearch">Search</span></a>
+    <div id="searchBox">
+      <button id="closeSearch">×</button>
+      <input type="text" id="sidebarSearchInput" placeholder="Search complaints...">
+      <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+    </div>
+    <a href="reels.html"><i class="fas fa-video"></i> <span id="navReels">Reels</span></a>
+    <a href="#" id="notificationTab"><i class="fas fa-bell"></i> <span id="navNotifications">Notification</span></a>
     <a href="create.html"><i class="fas fa-plus"></i> <span id="navCreate">Create</span></a>
     <a href="profile.html"><i class="fas fa-user"></i> <span id="navProfile">Profile</span></a>
+    <a href="#" onclick="showAppearancePopup()"><i class="fas fa-adjust"></i> <span id="navAppearance">Switch Appearance</span></a>
+    <a href="#"><i class="fas fa-list"></i> <span id="navActivity">Your Activity</span></a>
     <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="navLogout">Log Out</span></a>
   </div>
 
-  <div class="main-content">
-    <h2 id="createHeading">Report a Civic Issue</h2>
-    <p style="color: #666; margin-bottom: 20px;">
-      <i class="fas fa-info-circle"></i> <strong>Important:</strong> Photos must be taken with location services enabled to verify the issue location.
-    </p>
+  <div class="notification-sidebar" id="notificationSidebar">
+    <div class="notif-header">
+      <h3>🔔 Notifications</h3>
+      <button onclick="document.getElementById('notificationSidebar').classList.remove('show')">×</button>
+    </div>
+    <div id="notificationList"></div>
+  </div>
 
-    <form id="createComplaintForm">
-      <label for="title" id="labelComplaintTitle">Complaint Title</label>
-      <input type="text" id="title" required placeholder="e.g., Pothole on Main Street">
-      
-      <label for="category" id="labelCategory">Category</label>
-      <select id="category" required>
-        <option value="roads">🛣️ Roads</option>
-        <option value="garbage">🗑️ Garbage</option>
-        <option value="water">💧 Water</option>
-        <option value="electricity">⚡ Electricity</option>
-      </select>
-      
-      <label for="description" id="labelDescription">Description</label>
-      <textarea id="description" rows="4" required placeholder="Describe the issue in detail..."></textarea>
-      
-      <label for="image" id="labelUploadImage">Upload Image <span style="color: red;">*</span></label>
-      <input type="file" id="image" accept="image/*" required capture="environment">
-      <small style="color: #666;">📸 Make sure location services are enabled when taking the photo</small>
-      
-      <div id="geoInfo" class="geo-info"></div>
-      
-      <div class="preview" id="imagePreview">
-        <img src="" alt="Preview">
-      </div>
-      
-      <button type="submit" id="btnSubmitComplaint">
-        <i class="fas fa-paper-plane"></i> Submit Complaint
-      </button>
-      
-      <div class="message" id="complaintMessage"></div>
-    </form>
+  <div class="appearance-popup" id="appearance-popup">
+    <button class="close-btn" onclick="closeAppearancePopup()">×</button>
+    <strong id="appearanceTitle">Switch Appearance</strong>
+    <div class="dark-mode-toggle">
+      <span id="darkModeLabel">Dark Mode</span>
+      <input type="checkbox" id="darkToggle" onclick="toggleDarkMode()">
+    </div>
+  </div>
+
+  <div class="main-content">
+    <h2 id="createHeading">Create</h2>
+    <div class="tabs">
+      <div class="tab-button active" onclick="openTab('complaintTabContent', this)" id="complaintTab">Complaint</div>
+      <div class="tab-button" onclick="openTab('reelTabContent', this)" id="reelTab">Reel</div>
+    </div>
+
+    <div id="complaintTabContent" class="tab-content active">
+      <form id="createComplaintForm">
+        <label for="title" id="labelComplaintTitle">Complaint Title</label>
+        <input type="text" id="title" required>
+        <label for="category" id="labelCategory">Category</label>
+        <select id="category" required>
+          <option value="roads">Roads</option>
+          <option value="garbage">Garbage</option>
+          <option value="water">Water</option>
+          <option value="electricity">Electricity</option>
+        </select>
+        <label for="description" id="labelDescription">Description</label>
+        <textarea id="description" rows="4" required></textarea>
+        <label for="image" id="labelUploadImage">Upload Image</label>
+        <input type="file" id="image" accept="image/*" required>
+        <div class="preview" id="imagePreview"><img src="" alt="Preview"></div>
+        <button type="submit" id="btnSubmitComplaint">Submit Complaint</button>
+        <div class="message" id="complaintMessage"></div>
+      </form>
+    </div>
+
+    <div id="reelTabContent" class="tab-content">
+      <form id="createReelForm">
+        <label for="reelTitle" id="labelReelTitle">Reel Title / Caption</label>
+        <input type="text" id="reelTitle" required>
+        <label for="reelCategory" id="labelReelCategory">Category / Tags</label>
+        <input type="text" id="reelCategory" required>
+        <label for="reelVideo" id="labelUploadVideo">Upload Reel Video</label>
+        <input type="file" id="reelVideo" accept="video/*">
+        <div class="preview" id="videoPreview"><video controls></video></div>
+        <button type="submit" id="btnSubmitReel">Submit Reel</button>
+      </form>
+    </div>
   </div>
 
   <script>
-// Check authentication
+// Fixed script section for create.html
+// Replace the entire <script> section at the bottom of create.html with this
+
+// Check if user is logged in
 const userEmail = localStorage.getItem('userEmail');
 if(!userEmail){
   alert('Please login first!');
   window.location.href = 'signin.html';
 }
 
+function showAppearancePopup(){document.getElementById("appearance-popup").style.display="block";}
+function closeAppearancePopup(){document.getElementById("appearance-popup").style.display="none";}
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+}
 function logout(){
-  localStorage.clear();
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('userFullname');
   alert("Logging out..."); 
   window.location.href="index.html";
 }
 
-let issueLatitude = null;
-let issueLongitude = null;
-let hasValidGeoTag = false;
+function openTab(tabName, el){
+  document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
 
-// Handle image selection and EXIF extraction
-document.getElementById("image").addEventListener("change", function(e) {
-  const file = e.target.files[0];
-  const preview = document.querySelector("#imagePreview img");
-  const geoInfo = document.getElementById('geoInfo');
-  const messageDiv = document.getElementById('complaintMessage');
+document.getElementById("searchTab").addEventListener("click", function(e){
+  e.preventDefault(); 
+  const sb=document.getElementById("searchBox");
+  sb.style.display = sb.style.display==="block" ? "none":"block";
+});
+document.getElementById("closeSearch").addEventListener("click", ()=>document.getElementById("searchBox").style.display="none");
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const notifLink=document.getElementById('notificationTab'); 
+  const notifSidebar=document.getElementById('notificationSidebar'); 
+  notifLink.addEventListener('click', e=>{
+    e.preventDefault(); 
+    notifSidebar.classList.toggle('show'); 
+    renderNotifications();
+  }); 
   
-  if (file) {
-    // Show preview
-    preview.src = URL.createObjectURL(file);
-    document.getElementById("imagePreview").style.display = "block";
-    
-    // Extract EXIF data
-    EXIF.getData(file, function() {
-      const lat = EXIF.getTag(this, 'GPSLatitude');
-      const lng = EXIF.getTag(this, 'GPSLongitude');
-      const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
-      const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
-      
-      if (lat && lng) {
-        // Convert GPS coordinates to decimal
-        issueLatitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
-        issueLongitude = convertDMSToDD(lng[0], lng[1], lng[2], lngRef);
-        hasValidGeoTag = true;
-        
-        geoInfo.className = 'geo-info success';
-        geoInfo.style.display = 'block';
-        geoInfo.innerHTML = `
-          <i class="fas fa-check-circle"></i> <strong>Geo-tag verified!</strong><br>
-          Location: ${issueLatitude.toFixed(6)}, ${issueLongitude.toFixed(6)}<br>
-          <a href="https://www.google.com/maps?q=${issueLatitude},${issueLongitude}" target="_blank" style="color: #1976d2;">
-            <i class="fas fa-map-marker-alt"></i> View on Map
-          </a>
-        `;
-        messageDiv.innerHTML = '';
-      } else {
-        hasValidGeoTag = false;
-        issueLatitude = null;
-        issueLongitude = null;
-        
-        geoInfo.className = 'geo-info error';
-        geoInfo.style.display = 'block';
-        geoInfo.innerHTML = `
-          <i class="fas fa-exclamation-triangle"></i> <strong>No location data found!</strong><br>
-          This photo doesn't have GPS information. Please:<br>
-          1. Enable location services on your device<br>
-          2. Take a new photo at the issue location<br>
-          3. Make sure your camera app has location permission
-        `;
-        
-        messageDiv.className = 'message error';
-        messageDiv.innerHTML = '❌ Image must have location data. Please take a new photo with location services enabled.';
-      }
+  function renderNotifications(){
+    const data=[
+      {type:'Vote', message:'Someone upvoted your complaint.', time:'Just now'},
+      {type:'Comment', message:'New comment on your complaint.', time:'5m ago'},
+      {type:'Update', message:'Your complaint status changed.', time:'10m ago'}
+    ]; 
+    const list=document.getElementById('notificationList'); 
+    list.innerHTML=''; 
+    data.forEach(n=>{
+      const div=document.createElement('div'); 
+      div.className='notification-item'; 
+      div.innerHTML=`<div class="notif-type">${n.type}</div><div class="notif-message">${n.message}</div><div class="notif-time">${n.time}</div>`; 
+      list.appendChild(div);
     });
-  } else {
-    document.getElementById("imagePreview").style.display = "none";
-    geoInfo.style.display = 'none';
-    hasValidGeoTag = false;
+  }
+  
+  // Apply saved theme
+  if(localStorage.getItem('darkMode') === 'true'){
+    document.body.classList.add('dark');
+    document.getElementById('darkToggle').checked = true;
   }
 });
 
-// Convert DMS (Degrees, Minutes, Seconds) to Decimal Degrees
-function convertDMSToDD(degrees, minutes, seconds, direction) {
-  let dd = degrees + minutes/60 + seconds/3600;
-  if (direction === 'S' || direction === 'W') {
-    dd = dd * -1;
+document.getElementById("image").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  const preview = document.querySelector("#imagePreview img");
+  if(file){ 
+    preview.src = URL.createObjectURL(file); 
+    document.getElementById("imagePreview").style.display="block"; 
+  } else{ 
+    document.getElementById("imagePreview").style.display="none"; 
   }
-  return dd;
-}
+});
 
-// Get user's current location (for reference, not for the issue)
-let userLatitude = null;
-let userLongitude = null;
-
-navigator.geolocation.getCurrentPosition(
-  pos => {
-    userLatitude = pos.coords.latitude;
-    userLongitude = pos.coords.longitude;
-    console.log('User location obtained:', userLatitude, userLongitude);
-  }, 
-  error => {
-    console.warn("Could not get user location:", error);
-    userLatitude = 18.5204;
-    userLongitude = 73.8567;
-  }
-);
+let latitude="", longitude="";
+navigator.geolocation.getCurrentPosition(pos=>{
+  latitude=pos.coords.latitude;
+  longitude=pos.coords.longitude;
+  console.log('Location obtained:', latitude, longitude);
+}, (error)=>{ 
+  console.warn("Could not get location:", error);
+  // Use default Pune coordinates if location denied
+  latitude = 18.5204;
+  longitude = 73.8567;
+});
 
 // COMPLAINT FORM SUBMISSION
 const complaintForm = document.getElementById("createComplaintForm");
-complaintForm.addEventListener("submit", async (e) => {
+complaintForm.addEventListener("submit", async e=>{
   e.preventDefault();
   
   const messageDiv = document.getElementById("complaintMessage");
   const submitBtn = complaintForm.querySelector('button[type="submit"]');
   const originalBtnText = submitBtn.innerHTML;
-  
-  // Validate geo-tag
-  if (!hasValidGeoTag) {
-    messageDiv.className = "message error";
-    messageDiv.innerHTML = "❌ Please upload an image with location data (geo-tag). Take a new photo with location services enabled.";
-    return;
-  }
   
   // Disable submit button
   submitBtn.disabled = true;
@@ -252,114 +261,153 @@ complaintForm.addEventListener("submit", async (e) => {
   formData.append("description", document.getElementById("description").value);
   formData.append("category", document.getElementById("category").value);
   formData.append("image", document.getElementById("image").files[0]);
-  formData.append("latitude", userLatitude || 18.5204); // User's location
-  formData.append("longitude", userLongitude || 73.8567);
-  formData.append("issueLatitude", issueLatitude); // Issue location from photo
-  formData.append("issueLongitude", issueLongitude);
+  formData.append("latitude", latitude || 18.5204);
+  formData.append("longitude", longitude || 73.8567);
   formData.append("userEmail", userEmail);
 
-  try {
+  try{
     const res = await fetch("http://localhost:5000/report", { 
-      method: "POST", 
+      method:"POST", 
       body: formData 
     });
     const data = await res.json();
     
-    if (res.ok) { 
-      messageDiv.innerHTML = `
-        ✅ ${data.message}<br>
-        <small>Geo-tag verified and location recorded</small>
-      `; 
-      messageDiv.className = "message success"; 
+    if(res.ok){ 
+      messageDiv.innerText = "✅ " + data.message; 
+      messageDiv.className="message success"; 
       complaintForm.reset(); 
-      document.getElementById("imagePreview").style.display = "none";
-      document.getElementById("geoInfo").style.display = "none";
-      hasValidGeoTag = false;
+      document.getElementById("imagePreview").style.display="none";
       
       // Redirect to main page after 2 seconds
-      setTimeout(() => {
+      setTimeout(()=>{
         window.location.href = 'main.html';
       }, 2000);
-    } else { 
-      messageDiv.innerHTML = "❌ " + (data.message || "Error submitting complaint"); 
-      messageDiv.className = "message error";
+    } else{ 
+      messageDiv.innerText = "❌ " + (data.message||"Error submitting complaint"); 
+      messageDiv.className="message error";
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalBtnText;
     }
-  } catch (err) {
+  } catch(err){
     console.error('Upload error:', err);
-    messageDiv.innerHTML = "❌ Failed to connect to server. Make sure server is running on http://localhost:5000"; 
-    messageDiv.className = "message error";
+    messageDiv.innerText="❌ Failed to connect to server. Make sure server is running on http://localhost:5000"; 
+    messageDiv.className="message error";
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalBtnText;
   }
 });
 
+// REEL FORM SUBMISSION (Future feature)
+document.getElementById("createReelForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  alert("📹 Reel feature coming soon! For now, create a regular complaint.");
+});
+
 // LANGUAGE SYSTEM
-const translations = {
+const translations={
   en: {
     locationText: "📍 Pune, India",
     mainTitle: "Speak for the Streets",
     navHome: "Home",
+    navSearch: "Search",
+    navReels: "Reels",
+    navNotifications: "Notification",
     navCreate: "Create",
     navProfile: "Profile",
+    navAppearance: "Switch Appearance",
+    navActivity: "Your Activity",
     navLogout: "Log Out",
-    createHeading: "Report a Civic Issue",
+    createHeading: "Create",
+    complaintTab: "Complaint",
+    reelTab: "Reel",
     labelComplaintTitle: "Complaint Title",
     labelCategory: "Category",
     labelDescription: "Description",
     labelUploadImage: "Upload Image",
-    btnSubmitComplaint: "Submit Complaint"
+    btnSubmitComplaint: "Submit Complaint",
+    labelReelTitle: "Reel Title / Caption",
+    labelReelCategory: "Category / Tags",
+    labelUploadVideo: "Upload Reel Video",
+    btnSubmitReel: "Submit Reel",
+    appearanceTitle: "Switch Appearance",
+    darkModeLabel: "Dark Mode"
   },
   hi: {
     locationText: "📍 पुणे, भारत",
     mainTitle: "सड़कों के लिए बोलें",
     navHome: "होम",
+    navSearch: "खोजें",
+    navReels: "रील्स",
+    navNotifications: "सूचनाएं",
     navCreate: "बनाएँ",
     navProfile: "प्रोफ़ाइल",
+    navAppearance: "दिखावट बदलें",
+    navActivity: "आपकी गतिविधि",
     navLogout: "लॉग आउट",
-    createHeading: "नागरिक समस्या रिपोर्ट करें",
+    createHeading: "बनाएँ",
+    complaintTab: "शिकायत",
+    reelTab: "रील",
     labelComplaintTitle: "शिकायत का शीर्षक",
     labelCategory: "श्रेणी",
     labelDescription: "विवरण",
     labelUploadImage: "छवि अपलोड करें",
-    btnSubmitComplaint: "शिकायत सबमिट करें"
+    btnSubmitComplaint: "शिकायत सबमिट करें",
+    labelReelTitle: "रील शीर्षक / कैप्शन",
+    labelReelCategory: "श्रेणी / टैग",
+    labelUploadVideo: "रील वीडियो अपलोड करें",
+    btnSubmitReel: "रील सबमिट करें",
+    appearanceTitle: "दिखावट बदलें",
+    darkModeLabel: "डार्क मोड"
   },
   mr: {
     locationText: "📍 पुणे, भारत",
     mainTitle: "रस्त्यांसाठी बोला",
     navHome: "होम",
+    navSearch: "शोधा",
+    navReels: "रील्स",
+    navNotifications: "सूचना",
     navCreate: "तयार करा",
     navProfile: "प्रोफाइल",
+    navAppearance: "रूप बदला",
+    navActivity: "तुमची कृती",
     navLogout: "लॉग आउट",
-    createHeading: "नागरी समस्या नोंदवा",
+    createHeading: "तयार करा",
+    complaintTab: "तक्रार",
+    reelTab: "रील",
     labelComplaintTitle: "तक्रार शीर्षक",
     labelCategory: "श्रेणी",
     labelDescription: "वर्णन",
     labelUploadImage: "प्रतिमा अपलोड करा",
-    btnSubmitComplaint: "तक्रार सबमिट करा"
+    btnSubmitComplaint: "तक्रार सबमिट करा",
+    labelReelTitle: "रील शीर्षक / कॅप्शन",
+    labelReelCategory: "श्रेणी / टॅग",
+    labelUploadVideo: "रील व्हिडिओ अपलोड करा",
+    btnSubmitReel: "रील सबमिट करा",
+    appearanceTitle: "रूप बदला",
+    darkModeLabel: "डार्क मोड"
   }
 };
 
-function setLanguage(lang) {
-  Object.keys(translations[lang] || {}).forEach(id => {
+function setLanguage(lang){
+  Object.keys(translations[lang]||{}).forEach(id=>{
     const el = document.getElementById(id);
-    if (el) {
-      if (el.tagName === 'INPUT' || el.tagName === 'BUTTON') {
+    if(el) {
+      if(el.tagName === 'INPUT' || el.tagName === 'BUTTON') {
         el.value = translations[lang][id];
       } else {
         el.innerText = translations[lang][id];
       }
     }
   }); 
-  localStorage.setItem("preferredLanguage", lang);
+  localStorage.setItem("preferredLanguage",lang);
 }
 
-window.onload = () => {
-  const savedLang = localStorage.getItem("preferredLanguage") || "en"; 
-  document.getElementById("langSelect").value = savedLang; 
+window.onload=()=>{
+  const savedLang=localStorage.getItem("preferredLanguage")||"en"; 
+  document.getElementById("langSelect").value=savedLang; 
   setLanguage(savedLang);
 }
   </script>
 </body>
 </html>
+
