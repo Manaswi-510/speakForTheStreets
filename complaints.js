@@ -1,4 +1,4 @@
-// complaints.js - Enhanced with worker features (no location-based features)
+// Enhanced complaints.js with worker features and anonymous comments
 
 const userEmail = localStorage.getItem('userEmail') || 'anonymous@user.com';
 const userRole = localStorage.getItem('userRole') || 'citizen';
@@ -17,7 +17,7 @@ const statusIcons = {
   'solved': '🟢'
 };
 
-// Load all complaints
+// Load complaints based on user role
 async function loadComplaints() {
   try {
     const response = await fetch(`http://localhost:5000/reports?userRole=${userRole}`);
@@ -94,6 +94,18 @@ function createComplaintCard(report) {
         <h3 style="margin: 10px 0; font-size: 18px;">${escapeHtml(report.title)}</h3>
         <p style="color: #555; font-size: 14px; line-height: 1.5;">${escapeHtml(report.description)}</p>
         
+        ${report.issueLatitude && report.issueLongitude ? `
+          <div style="margin-top: 8px; font-size: 12px; color: #888;">
+            📍 Issue Location: ${report.issueLatitude.toFixed(4)}, ${report.issueLongitude.toFixed(4)}
+            <a href="https://www.google.com/maps?q=${report.issueLatitude},${report.issueLongitude}" 
+               target="_blank" 
+               style="color: #007bff; margin-left: 8px;">
+              <i class="fas fa-map-marker-alt"></i> View on Map
+            </a>
+            ${report.hasGeoTag ? '<span style="color: #28a745; margin-left: 8px;"><i class="fas fa-check-circle"></i> Geo-verified</span>' : ''}
+          </div>
+        ` : ''}
+
         ${report.assignedTo ? `
           <div style="margin-top: 8px; padding: 8px; background: #e8f5e9; border-radius: 6px; font-size: 13px;">
             <i class="fas fa-user-tie" style="color: #4caf50;"></i> Assigned to: <strong>${isAssignedWorker ? 'You' : 'Worker'}</strong>
