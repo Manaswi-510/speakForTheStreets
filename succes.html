@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title data-i18n="issue_submitted_title">Issue Submitted</title>
 
   <!-- TailwindCSS & AOS -->
@@ -9,11 +9,14 @@
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
   <!-- Custom Theme -->
-  <link rel="stylesheet" href="/static/css/theme.css">
-  <link rel="stylesheet" href="/static/css/animate.css">
+  <link rel="stylesheet" href="/static/css/theme.css" />
+  <link rel="stylesheet" href="/static/css/animate.css" />
 
   <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
 
   <style>
     .language-switcher select {
@@ -25,36 +28,49 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-tr from-gray-100 to-white min-h-screen flex items-center justify-center px-4 relative">
-
+<body
+  class="bg-gradient-to-tr from-gray-100 to-white min-h-screen flex items-center justify-center px-4 relative"
+>
   <!-- 🌐 Language Switcher -->
   <div class="absolute top-6 right-6 language-switcher">
     <select id="languageSelect" onchange="changeLanguage()" class="bg-white border border-gray-300 rounded px-3 py-1 shadow">
-      <option value="en">🌐 English</option>
-      <option value="hi">🇮🇳 हिंदी</option>
-      <option value="mr">🌿 मराठी</option>
+      <option value="en" data-i18n="lang_en">🌐 English</option>
+      <option value="hi" data-i18n="lang_hi">🇮🇳 हिंदी</option>
+      <option value="mr" data-i18n="lang_mr">🌿 मराठी</option>
     </select>
   </div>
 
   <!-- ✅ Success Card -->
-  <div class="max-w-xl w-full bg-white p-8 rounded-2xl shadow-2xl text-center" data-aos="fade-up">
-    <div class="text-green-500 text-6xl mb-4">✅</div>
-    
+  <div
+    class="max-w-xl w-full bg-white p-8 rounded-2xl shadow-2xl text-center"
+    data-aos="fade-up"
+  >
+    <div class="text-green-500 text-6xl mb-4" aria-label="success-icon">✅</div>
+
     <h1 class="text-3xl font-bold text-gray-800 mb-4" data-i18n="issue_submitted_heading">
       Issue Submitted Successfully
     </h1>
 
     <p class="text-gray-600 text-lg leading-relaxed" data-i18n="issue_submitted_msg">
-      Thank you for reporting this issue in your locality. Your voice matters!<br>
-      Others can now see your post, vote on it, and leave comments.<br><br>
+      Thank you for reporting this issue in your locality. 
+      <br>Your voice matters!<br />
+      Others can now see your post, vote on it, and leave comments.<br /><br />
       Once the complaint receives <strong>10 or more votes</strong>, it will be automatically forwarded to the relevant municipal authority.
     </p>
 
     <div class="mt-8 flex justify-center gap-4 flex-wrap">
-      <a href="main.html" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl transition duration-300 text-lg font-medium shadow" data-i18n="view_issues">
+      <a
+        href="main.html"
+        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl transition duration-300 text-lg font-medium shadow"
+        data-i18n="view_issues"
+      >
         🌍 View All Issues
       </a>
-      <a href="upload.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition duration-300 text-lg font-medium shadow" data-i18n="post_another">
+      <a
+        href="create.html"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition duration-300 text-lg font-medium shadow"
+        data-i18n="post_another"
+      >
         ➕ Post Another
       </a>
     </div>
@@ -62,7 +78,91 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script>AOS.init();</script>
-  <script src="/static/js/lang.js"></script>
+  <script>
+    AOS.init();
+  </script>
+
+  <!-- Multilingual Translation Script -->
+  <script>
+    // Translation data
+    const translations = {
+      issue_submitted_title: {
+        en: "Issue Submitted",
+        hi: "समस्या दर्ज की गई",
+        mr: "तक्रार सबमिट झाली",
+      },
+      issue_submitted_heading: {
+        en: "Issue Submitted Successfully",
+        hi: "समस्या सफलतापूर्वक सबमिट हो गई",
+        mr: "तक्रार यशस्वीरीत्या सबमिट झाली",
+      },
+      issue_submitted_msg: {
+        en:
+          "Thank you for reporting this issue in your locality. Your voice matters! Others can now see your post, vote on it, and leave comments. Once the complaint receives 10 or more votes, it will be automatically forwarded to the relevant municipal authority.",
+        hi:
+          "आपके क्षेत्र की समस्या रिपोर्ट करने के लिए धन्यवाद। आपकी आवाज़ मायने रखती है! अब दूसरे लोग आपकी पोस्ट देख सकते हैं, वोट कर सकते हैं और टिप्पणी कर सकते हैं। जब शिकायत को 10 या अधिक वोट मिलेंगे, तो यह स्वचालित रूप से नगरपालिका प्राधिकरण को भेज दी जाएगी।",
+        mr:
+          "आपल्या परिसरातील समस्या नोंदवल्याबद्दल धन्यवाद. तुमचा आवाज महत्त्वाचा आहे! आता इतर लोक तुमची पोस्ट पाहू शकतात, मतदान करू शकतात आणि कमेंट करू शकतात. तक्रारीला 10 किंवा अधिक मते मिळाल्यानंतर ती आपोआप महानगरपालिकेकडे पाठवली जाईल.",
+      },
+      view_issues: {
+        en: "🌍 View All Issues",
+        hi: "🌍 सभी समस्याएँ देखें",
+        mr: "🌍 सर्व तक्रारी पहा",
+      },
+      post_another: {
+        en: "➕ Post Another",
+        hi: "➕ एक और समस्या पोस्ट करें",
+        mr: "➕ आणखी एक तक्रार पोस्ट करा",
+      },
+      lang_en: {
+        en: "🌐 English",
+        hi: "🌐 English",
+        mr: "🌐 English",
+      },
+      lang_hi: {
+        en: "🇮🇳 Hindi",
+        hi: "🇮🇳 हिंदी",
+        mr: "🇮🇳 हिंदी",
+      },
+      lang_mr: {
+        en: "🌿 Marathi",
+        hi: "🌿 मराठी",
+        mr: "🌿 मराठी",
+      },
+    };
+
+    // Function to translate page based on selected language
+    function changeLanguage() {
+      const select = document.getElementById("languageSelect");
+      const lang = select.value;
+
+      // Save to localStorage (optional)
+      localStorage.setItem("selectedLanguage", lang);
+
+      // Translate all elements with data-i18n
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[key] && translations[key][lang]) {
+          if (el.tagName.toLowerCase() === "input" || el.tagName.toLowerCase() === "textarea") {
+            el.placeholder = translations[key][lang];
+          } else {
+            el.innerHTML = translations[key][lang];
+          }
+        }
+      });
+
+      // Also update document title if applicable
+      if (translations["issue_submitted_title"] && translations["issue_submitted_title"][lang]) {
+        document.title = translations["issue_submitted_title"][lang];
+      }
+    }
+
+    // On page load, set language from localStorage or default to English
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedLang = localStorage.getItem("selectedLanguage") || "en";
+      document.getElementById("languageSelect").value = savedLang;
+      changeLanguage();
+    });
+  </script>
 </body>
 </html>
