@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Activity | Speak for the Streets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    body { margin:0; font-family:'Segoe UI', Tahoma, sans-serif; background:#fafafa; color:#111; }
+    .activity-header { background:#fff; padding:16px; border-bottom:1px solid #e6e6e6; position:sticky; top:0; text-align:center; z-index:5; }
+    .activity-header h2 { margin:0; font-weight:600; }
+
+    .activity-sections { padding:18px; max-width:600px; margin:0 auto; }
+    .activity-card { display:flex; align-items:center; gap:14px; background:#fff; border-radius:12px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.06); margin-bottom:12px; cursor:pointer; transition:transform .15s ease; }
+    .activity-card:hover { transform:translateY(-3px); }
+    .activity-card i { font-size:22px; color:#2ecc71; }
+    .card-text h3 { margin:0; font-size:16px; font-weight:600; }
+    .card-text p { margin:6px 0 0; color:#666; font-size:13px; }
+    .arrow { margin-left:auto; color:#9aa0a6; }
+
+    .detail-section { display:none; position:fixed; right:20px; top:90px; width:360px; max-width:calc(100% - 40px); background:#fff; border-radius:12px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12); z-index:20; }
+    .detail-section.active { display:block; }
+    .back-btn { background:none; border:none; color:#2ecc71; font-size:14px; cursor:pointer; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    #detailContent h3 { margin:0 0 8px 0; }
+    #detailContent p, #detailContent li { color:#333; }
+
+    @media (max-width:780px){
+      .detail-section { position:static; width:auto; margin:18px; }
+      .activity-sections { padding-bottom:100px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="activity-header">
+    <h2>Your Activity</h2>
+  </header>
+
+  <main class="activity-sections">
+    <div class="activity-card" data-section="time">
+      <i class="fas fa-clock"></i>
+      <div class="card-text">
+        <h3>Time Spent</h3>
+        <p>Track how much time you spend on Speak for the Streets.</p>
+      </div>
+      <i class="fas fa-chevron-right arrow"></i>
+    </div>
+
+    <div class="activity-card" data-section="interactions">
+      <i class="fas fa-heart"></i>
+      <div class="card-text">
+        <h3>Interactions</h3>
+        <p>View your likes, votes, and comments.</p>
+      </div>
+      <i class="fas fa-chevron-right arrow"></i>
+    </div>
+
+    <div class="activity-card" data-section="recent">
+      <i class="fas fa-bell"></i>
+      <div class="card-text">
+        <h3>Recent Activity</h3>
+        <p>See your latest actions and updates.</p>
+      </div>
+      <i class="fas fa-chevron-right arrow"></i>
+    </div>
+
+    <div class="activity-card" data-section="shared">
+      <i class="fas fa-share-alt"></i>
+      <div class="card-text">
+        <h3>Shared Posts</h3>
+        <p>Check what you’ve shared recently.</p>
+      </div>
+      <i class="fas fa-chevron-right arrow"></i>
+    </div>
+
+    <div class="activity-card" data-section="history">
+      <i class="fas fa-user-check"></i>
+      <div class="card-text">
+        <h3>Account History</h3>
+        <p>View your complaint history and updates.</p>
+      </div>
+      <i class="fas fa-chevron-right arrow"></i>
+    </div>
+  </main>
+
+  <aside id="detailSection" class="detail-section">
+    <button id="backBtn" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+    <div id="detailContent"></div>
+  </aside>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const cards = document.querySelectorAll('.activity-card');
+      const detailSection = document.getElementById('detailSection');
+      const detailContent = document.getElementById('detailContent');
+      const backBtn = document.getElementById('backBtn');
+
+      const contentMap = {
+        time: {
+          title: 'Time Spent',
+          html: '<p>You spent <b>1h 25m</b> on Speak for the Streets today.</p><p>Tip: Take breaks!</p>'
+        },
+        interactions: {
+          title: 'Interactions',
+          html: '<ul><li>Liked 5 posts this week ❤</li><li>Commented on 2 posts 💬</li><li>Voted on 3 complaints 👍</li></ul>'
+        },
+        recent: {
+          title: 'Recent Activity',
+          html: '<ul><li>Posted a complaint: "Broken streetlight near MG Road"</li><li>Followed user @Riya</li><li>Shared a cleanliness post</li></ul>'
+        },
+        shared: {
+          title: 'Shared Posts',
+          html: '<p>You shared <b>3</b> posts this month.</p><ul><li>Tree plantation update</li><li>Road repair status</li></ul>'
+        },
+        history: {
+          title: 'Account History',
+          html: '<ul><li>"Garbage issue - Resolved" ✅</li><li>"Water leakage - Under review" 🔄</li></ul>'
+        }
+      };
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const section = card.getAttribute('data-section');
+          if (!contentMap[section]) return;
+          const item = contentMap[section];
+          detailContent.innerHTML = '<h3>' + item.title + '</h3>' + item.html;
+          detailSection.classList.add('active');
+        });
+      });
+
+      backBtn.addEventListener('click', () => {
+        detailSection.classList.remove('active');
+        detailContent.innerHTML = '';
+      });
+    });
+  </script>
+</body>
+</html>
