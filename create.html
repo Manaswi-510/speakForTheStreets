@@ -166,7 +166,7 @@
 
   <script>
 // Fixed script section for create.html
-// Replace the entire <script> section at the bottom of create.html with this
+// Replace everything inside the <script> tags at the bottom of create.html with this
 
 // Check if user is logged in
 const userEmail = localStorage.getItem('userEmail');
@@ -201,6 +201,97 @@ document.getElementById("searchTab").addEventListener("click", function(e){
   sb.style.display = sb.style.display==="block" ? "none":"block";
 });
 document.getElementById("closeSearch").addEventListener("click", ()=>document.getElementById("searchBox").style.display="none");
+
+// ✅ NEW: Map Location Picker Function
+function pickLocationOnMap() {
+  // Create modal with map
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  
+  modal.innerHTML = `
+    <div style="background: white; border-radius: 16px; padding: 20px; width: 90%; max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="margin: 0; color: #333;">📍 Pick Issue Location</h3>
+        <button onclick="this.closest('div').parentElement.parentElement.remove()" 
+                style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+          Close
+        </button>
+      </div>
+      <div id="mapPicker" style="flex: 1; border-radius: 12px; overflow: hidden;"></div>
+      <div style="margin-top: 15px; text-align: center;">
+        <button id="confirmLocation" 
+                style="background: #28a745; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          ✓ Confirm This Location
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Load Leaflet if not already loaded
+  if (!window.L) {
+    const leafletCSS = document.createElement('link');
+    leafletCSS.rel = 'stylesheet';
+    leafletCSS.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(leafletCSS);
+    
+    const leafletJS = document.createElement('script');
+    leafletJS.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    leafletJS.onload = initializeMap;
+    document.head.appendChild(leafletJS);
+  } else {
+    initializeMap();
+  }
+  
+  function initializeMap() {
+    // Get current location or use Pune as default
+    const defaultLat = parseFloat(latitude) || 18.5204;
+    const defaultLng = parseFloat(longitude) || 73.8567;
+    
+    const map = L.map('mapPicker').setView([defaultLat, defaultLng], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add draggable marker
+    const marker = L.marker([defaultLat, defaultLng], {
+      draggable: true
+    }).addTo(map);
+    
+    marker.bindPopup('📍 Drag me to the issue location!').openPopup();
+    
+    let selectedLat = defaultLat;
+    let selectedLng = defaultLng;
+    
+    marker.on('dragend', function(e) {
+      const pos = marker.getLatLng();
+      selectedLat = pos.lat;
+      selectedLng = pos.lng;
+      marker.setPopupContent(`📍 Location: ${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`).openPopup();
+    });
+    
+    // Confirm button handler
+    document.getElementById('confirmLocation').onclick = function() {
+      document.getElementById('issueLatitude').value = selectedLat.toFixed(6);
+      document.getElementById('issueLongitude').value = selectedLng.toFixed(6);
+      modal.remove();
+      alert('✅ Location selected successfully!');
+    };
+  }
+}
 
 document.addEventListener('DOMContentLoaded', ()=>{
   const notifLink=document.getElementById('notificationTab'); 
@@ -252,12 +343,11 @@ navigator.geolocation.getCurrentPosition(pos=>{
   console.log('Location obtained:', latitude, longitude);
 }, (error)=>{ 
   console.warn("Could not get location:", error);
-  // Use default Pune coordinates if location denied
   latitude = 18.5204;
   longitude = 73.8567;
 });
 
-// COMPLAINT FORM SUBMISSION
+// ✅ FIXED: COMPLAINT FORM SUBMISSION with Issue Location
 const complaintForm = document.getElementById("createComplaintForm");
 complaintForm.addEventListener("submit", async e=>{
   e.preventDefault();
@@ -266,17 +356,23 @@ complaintForm.addEventListener("submit", async e=>{
   const submitBtn = complaintForm.querySelector('button[type="submit"]');
   const originalBtnText = submitBtn.innerHTML;
   
-  // Disable submit button
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
   messageDiv.innerText = "Uploading complaint...";
   messageDiv.className = "message";
   
   const formData = new FormData();
- formData.append("latitude", latitude || 18.5204); // User's location
-  formData.append("longitude", longitude || 73.8567); // User's location
+  formData.append("title", document.getElementById("title").value);
+  formData.append("description", document.getElementById("description").value);
+  formData.append("category", document.getElementById("category").value);
+  formData.append("userEmail", userEmail);
+  formData.append("image", document.getElementById("image").files[0]);
   
-  // Issue location (where the problem actually is)
+  // User's current location
+  formData.append("latitude", latitude || 18.5204);
+  formData.append("longitude", longitude || 73.8567);
+  
+  // ✅ FIXED: Include issue location from manual input or map picker
   const issueLat = document.getElementById("issueLatitude").value;
   const issueLng = document.getElementById("issueLongitude").value;
   formData.append("issueLatitude", issueLat || latitude || 18.5204);
@@ -295,7 +391,6 @@ complaintForm.addEventListener("submit", async e=>{
       complaintForm.reset(); 
       document.getElementById("imagePreview").style.display="none";
       
-      // Redirect to main page after 2 seconds
       setTimeout(()=>{
         window.location.href = 'main.html';
       }, 2000);
