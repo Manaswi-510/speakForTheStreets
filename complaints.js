@@ -56,7 +56,9 @@ function displayComplaints(reports) {
   attachComplaintEventListeners();
 }
 
-// Create HTML for a single complaint card
+// Enhanced complaints.js with Fund Request feature
+// Replace the createComplaintCard function (lines 106-210) with this
+
 function createComplaintCard(report) {
   const statusColor = statusColors[report.status];
   const statusIcon = statusIcons[report.status];
@@ -73,6 +75,8 @@ function createComplaintCard(report) {
   const isOwner = report.userEmail === userEmail;
   const isWorker = userRole === 'worker';
   const isAssignedWorker = report.assignedTo === userEmail;
+  const canRequestFund = (report.votes >= 10 || report.escalated) && !report.fundRequest?.requested;
+  const hasFundRequest = report.fundRequest?.requested;
 
   return `
     <div class="complaint-card" data-id="${report._id}" style="border-left: 5px solid ${statusColor};">
@@ -95,20 +99,40 @@ function createComplaintCard(report) {
         <p style="color: #555; font-size: 14px; line-height: 1.5;">${escapeHtml(report.description)}</p>
         
         ${report.issueLatitude && report.issueLongitude ? `
-          <div style="margin-top: 8px; font-size: 12px; color: #888;">
-            📍 Issue Location: ${report.issueLatitude.toFixed(4)}, ${report.issueLongitude.toFixed(4)}
+          <div style="margin-top: 8px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-size: 13px; color: #666; margin-bottom: 5px;">
+              📍 <strong>Issue Location:</strong> ${report.issueLatitude.toFixed(4)}, ${report.issueLongitude.toFixed(4)}
+              ${report.hasGeoTag ? '<span style="color: #28a745; margin-left: 8px;"><i class="fas fa-check-circle"></i> Geo-verified</span>' : ''}
+            </div>
             <a href="https://www.google.com/maps?q=${report.issueLatitude},${report.issueLongitude}" 
                target="_blank" 
-               style="color: #007bff; margin-left: 8px;">
-              <i class="fas fa-map-marker-alt"></i> View on Map
+               style="display: inline-block; color: #007bff; text-decoration: none; font-size: 13px;">
+              <i class="fas fa-map-marker-alt"></i> View on Google Maps
             </a>
-            ${report.hasGeoTag ? '<span style="color: #28a745; margin-left: 8px;"><i class="fas fa-check-circle"></i> Geo-verified</span>' : ''}
           </div>
         ` : ''}
 
         ${report.assignedTo ? `
           <div style="margin-top: 8px; padding: 8px; background: #e8f5e9; border-radius: 6px; font-size: 13px;">
             <i class="fas fa-user-tie" style="color: #4caf50;"></i> Assigned to: <strong>${isAssignedWorker ? 'You' : 'Worker'}</strong>
+          </div>
+        ` : ''}
+
+        ${hasFundRequest ? `
+          <div style="margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <i class="fas fa-money-bill-wave" style="font-size: 20px;"></i>
+              <strong style="font-size: 15px;">Fund Release Requested</strong>
+            </div>
+            <div style="font-size: 12px; opacity: 0.9;">
+              Status: <strong>${report.fundRequest.status.toUpperCase()}</strong><br>
+              Amount: ₹${report.fundRequest.estimatedAmount?.toLocaleString() || 'TBD'}<br>
+              Requested: ${new Date(report.fundRequest.requestDate).toLocaleDateString()}
+            </div>
+            <button onclick="viewFundRequest('${report._id}')" 
+                    style="margin-top: 8px; background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+              <i class="fas fa-file-pdf"></i> View Details
+            </button>
           </div>
         ` : ''}
 
@@ -132,6 +156,13 @@ function createComplaintCard(report) {
             <span style="background: #f39c12; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">
               ⚠️ ESCALATED
             </span>
+          ` : ''}
+
+          ${canRequestFund && (isWorker || report.votes >= 10) ? `
+            <button onclick="openFundRequestModal('${report._id}')" 
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px;">
+              <i class="fas fa-hand-holding-usd"></i> Request Funds
+            </button>
           ` : ''}
 
           ${isWorker && !report.assignedTo ? `
@@ -182,6 +213,180 @@ function createComplaintCard(report) {
       </div>
     </div>
   `;
+}
+
+// Fund Request Modal Functions
+function openFundRequestModal(reportId) {
+  const modal = document.createElement('div');
+  modal.id = 'fundRequestModal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  `;
+  
+  modal.innerHTML = `
+    <div style="background: white; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%;">
+      <h2 style="margin-top: 0; color: #333;">
+        <i class="fas fa-hand-holding-usd" style="color: #667eea;"></i> 
+        Request Fund Release
+      </h2>
+      
+      <form id="fundRequestForm">
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600;">Estimated Amount (₹)</label>
+          <input type="number" id="estimatedAmount" required 
+                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;" 
+                 placeholder="e.g., 50000">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600;">Justification</label>
+          <textarea id="justification" required rows="4"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"
+                    placeholder="Explain why funds are urgently needed for this issue..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" 
+                  style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-paper-plane"></i> Submit Request
+          </button>
+          <button type="button" onclick="closeFundRequestModal()"
+                  style="flex: 1; background: #ccc; color: #333; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  document.getElementById('fundRequestForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await submitFundRequest(reportId);
+  });
+}
+
+function closeFundRequestModal() {
+  const modal = document.getElementById('fundRequestModal');
+  if (modal) modal.remove();
+}
+
+async function submitFundRequest(reportId) {
+  const amount = document.getElementById('estimatedAmount').value;
+  const justification = document.getElementById('justification').value;
+  
+  try {
+    const response = await fetch(`http://localhost:5000/report/${reportId}/fund-request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requesterEmail: userEmail,
+        requesterRole: userRole,
+        estimatedAmount: parseFloat(amount),
+        justification: justification
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      alert('✅ Fund release request submitted successfully!');
+      closeFundRequestModal();
+      loadComplaints(); // Reload to show updated status
+    } else {
+      alert('❌ ' + data.message);
+    }
+  } catch (error) {
+    console.error('Fund request error:', error);
+    alert('Failed to submit fund request. Please try again.');
+  }
+}
+
+async function viewFundRequest(reportId) {
+  try {
+    const response = await fetch(`http://localhost:5000/report/${reportId}/fund-request`);
+    const data = await response.json();
+    
+    if (data.fundRequest) {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+          <h2 style="margin-top: 0; color: #667eea;">
+            <i class="fas fa-file-invoice-dollar"></i> Fund Request Details
+          </h2>
+          
+          <div style="margin-bottom: 15px;">
+            <strong>Status:</strong> 
+            <span style="padding: 4px 12px; background: ${
+              data.fundRequest.status === 'approved' ? '#4caf50' : 
+              data.fundRequest.status === 'rejected' ? '#f44336' : '#ff9800'
+            }; color: white; border-radius: 12px; font-size: 12px;">
+              ${data.fundRequest.status.toUpperCase()}
+            </span>
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <strong>Requested By:</strong> ${data.fundRequest.requestedByRole === 'worker' ? 'Worker' : 'Citizen'}
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <strong>Estimated Amount:</strong> ₹${data.fundRequest.estimatedAmount?.toLocaleString()}
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <strong>Request Date:</strong> ${new Date(data.fundRequest.requestDate).toLocaleDateString()}
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <strong>Justification:</strong>
+            <p style="background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 5px;">
+              ${data.fundRequest.justification}
+            </p>
+          </div>
+          
+          <button onclick="this.parentElement.parentElement.remove()" 
+                  style="width: 100%; background: #667eea; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+            Close
+          </button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+  } catch (error) {
+    console.error('Error fetching fund request:', error);
+    alert('Failed to load fund request details');
+  }
+}
+
+// Export new functions
+if (typeof window !== 'undefined') {
+  window.openFundRequestModal = openFundRequestModal;
+  window.closeFundRequestModal = closeFundRequestModal;
+  window.viewFundRequest = viewFundRequest;
 }
 
 // Attach event listeners
@@ -448,3 +653,4 @@ if (typeof window !== 'undefined') {
   window.updateStatus = updateStatus;
   window.deleteComplaint = deleteComplaint;
 }
+
