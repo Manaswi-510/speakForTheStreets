@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issue Map - Speak for the Streets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS for Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f0f2f5;
+    }
+    
+    header {
+      background: #000;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .btn {
+      background: #2ecc71;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .btn:hover {
+      background: #27ae60;
+    }
+    
+    #map {
+      height: calc(100vh - 70px);
+      width: 100%;
+    }
+    
+    .legend {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      font-size: 14px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    
+    .legend-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    
+    .marker-popup {
+      max-width: 250px;
+    }
+    
+    .marker-popup h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    
+    .marker-popup p {
+      margin: 5px 0;
+      font-size: 13px;
+    }
+    
+    .marker-popup img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    
+    .view-details-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      width: 100%;
+      margin-top: 8px;
+    }
+    
+    .loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 10000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-title">
+      <i class="fas fa-map-marked-alt"></i> Issue Map
+    </div>
+    <div class="header-actions">
+      <a href="main.html" class="btn">
+        <i class="fas fa-arrow-left"></i> Back to Feed
+      </a>
+    </div>
+  </header>
+  
+  <div id="map"></div>
+  
+  <div class="legend">
+    <h4 style="margin-bottom: 10px;">Status Legend</h4>
+    <div class="legend-item">
+      <div class="legend-icon" style="background: #ef4444;"></div>
+      <span>🔴 Unsolved</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon" style="background: #f59e0b;"></div>
+      <span>🟡 In Progress</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-icon" style="background: #10b981;"></div>
+      <span>🟢 Solved</span>
+    </div>
+  </div>
+  
+  <div id="loading" class="loading">
+    <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: #2ecc71; margin-bottom: 10px;"></i>
+    <p>Loading issue locations...</p>
+  </div>
+  
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <script>
+    // Status colors matching your system
+    const statusColors = {
+      'unsolved': '#ef4444',
+      'in-progress': '#f59e0b',
+      'solved': '#10b981'
+    };
+    
+    // Initialize map centered on Pune
+    const map = L.map('map').setView([18.5204, 73.8567], 12);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+    
+    // Load and display reports
+    async function loadIssueMarkers() {
+      try {
+        const response = await fetch('http://localhost:5000/reports');
+        const reports = await response.json();
+        
+        // Hide loading
+        document.getElementById('loading').style.display = 'none';
+        
+        // Filter reports with valid issue locations
+        const validReports = reports.filter(r => 
+          r.issueLatitude && 
+          r.issueLongitude && 
+          r.issueLatitude !== 0 && 
+          r.issueLongitude !== 0
+        );
+        
+        if (validReports.length === 0) {
+          alert('No issues with location data found yet.');
+          return;
+        }
+        
+        // Add markers for each report
+        validReports.forEach(report => {
+          const color = statusColors[report.status];
+          
+          // Create custom colored marker
+          const markerIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="
+              background: ${color};
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 14px;
+              font-weight: bold;
+            ">
+              ${report.status === 'unsolved' ? '!' : report.status === 'in-progress' ? '⏳' : '✓'}
+            </div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, -15]
+          });
+          
+          // Create marker
+          const marker = L.marker([report.issueLatitude, report.issueLongitude], {
+            icon: markerIcon
+          }).addTo(map);
+          
+          // Create popup content
+          const imageUrl = report.image ? 
+            `http://localhost:5000/uploads/${report.image}` : 
+            'https://via.placeholder.com/250x150?text=No+Image';
+          
+          const popupContent = `
+            <div class="marker-popup">
+              <h3>${escapeHtml(report.title)}</h3>
+              <img src="${imageUrl}" alt="${report.title}" onerror="this.style.display='none'">
+              <p><strong>Category:</strong> ${report.category}</p>
+              <p><strong>Status:</strong> ${report.status}</p>
+              <p><strong>Votes:</strong> ${report.votes}</p>
+              ${report.hasGeoTag ? '<p style="color: #28a745;"><i class="fas fa-check-circle"></i> Geo-verified</p>' : ''}
+              <button class="view-details-btn" onclick="window.location.href='main.html#report-${report._id}'">
+                <i class="fas fa-eye"></i> View Details
+              </button>
+            </div>
+          `;
+          
+          marker.bindPopup(popupContent, {
+            maxWidth: 250,
+            className: 'custom-popup'
+          });
+        });
+        
+        // Fit map to show all markers
+        const bounds = L.latLngBounds(validReports.map(r => [r.issueLatitude, r.issueLongitude]));
+        map.fitBounds(bounds, { padding: [50, 50] });
+        
+      } catch (error) {
+        console.error('Error loading issues:', error);
+        document.getElementById('loading').innerHTML = `
+          <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ef4444; margin-bottom: 10px;"></i>
+          <p>Failed to load issues. Make sure the server is running.</p>
+        `;
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Load markers when page loads
+    loadIssueMarkers();
+    
+    // Add user's current location marker (if available)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        L.marker([position.coords.latitude, position.coords.longitude], {
+          icon: L.divIcon({
+            className: 'user-location-marker',
+            html: '<div style="background: #2196f3; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+            iconSize: [20, 20]
+          })
+        }).addTo(map).bindPopup('📍 Your Location');
+      });
+    }
+  </script>
+</body>
+</html>
