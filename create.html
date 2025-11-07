@@ -273,13 +273,14 @@ complaintForm.addEventListener("submit", async e=>{
   messageDiv.className = "message";
   
   const formData = new FormData();
-  formData.append("title", document.getElementById("title").value);
-  formData.append("description", document.getElementById("description").value);
-  formData.append("category", document.getElementById("category").value);
-  formData.append("image", document.getElementById("image").files[0]);
-  formData.append("latitude", latitude || 18.5204);
-  formData.append("longitude", longitude || 73.8567);
-  formData.append("userEmail", userEmail);
+ formData.append("latitude", latitude || 18.5204); // User's location
+  formData.append("longitude", longitude || 73.8567); // User's location
+  
+  // Issue location (where the problem actually is)
+  const issueLat = document.getElementById("issueLatitude").value;
+  const issueLng = document.getElementById("issueLongitude").value;
+  formData.append("issueLatitude", issueLat || latitude || 18.5204);
+  formData.append("issueLongitude", issueLng || longitude || 73.8567);
 
   try{
     const res = await fetch("http://localhost:5000/report", { 
