@@ -378,97 +378,244 @@
       `;
     }
     
-    function generatePDF(reportId) {
-      const report = allRequests.find(r => r._id === reportId);
-      if (!report) return;
-      
-      // Create a formatted report document
-      const pdfContent = `
-===========================================
-FUND RELEASE REQUEST REPORT
-===========================================
+
+
+function generatePDF(reportId) {
+  const report = allRequests.find(r => r._id === reportId);
+  if (!report) return;
+  
+  // Check if jsPDF is loaded
+  if (typeof window.jspdf === 'undefined') {
+    alert('Loading PDF generator...');
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload = () => generatePDF(reportId);
+    document.head.appendChild(script);
+    return;
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Header with gradient effect
+  doc.setFillColor(102, 126, 234);
+  doc.rect(0, 0, 210, 40, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(24);
+  doc.setFont(undefined, 'bold');
+  doc.text('FUND RELEASE REQUEST', 105, 20, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'normal');
+  doc.text('Municipal Authority - Civic Complaint System', 105, 30, { align: 'center' });
+  
+  // Reset text color for body
+  doc.setTextColor(0, 0, 0);
+  let yPos = 50;
+  
+  // Report Information Section
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text('📋 COMPLAINT DETAILS', 20, yPos);
+  yPos += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
+  
+  const addField = (label, value, color = [0, 0, 0]) => {
+    doc.setFont(undefined, 'bold');
+    doc.text(label + ':', 20, yPos);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(...color);
+    const lines = doc.splitTextToSize(value || 'N/A', 120);
+    doc.text(lines, 70, yPos);
+    doc.setTextColor(0, 0, 0);
+    yPos += (lines.length * 6) + 2;
+  };
+  
+  addField('Report ID', report._id);
+  addField('Title', report.title);
+  addField('Category', report.category.toUpperCase(), [102, 126, 234]);
+  addField('Status', report.status.toUpperCase(), 
+    report.status === 'solved' ? [16, 185, 129] : 
+    report.status === 'in-progress' ? [245, 158, 11] : [239, 68, 68]);
+  addField('Description', report.description);
+  
+  yPos += 5;
+  
+  // Location Section
+  if (report.issueLatitude && report.issueLongitude) {
+    doc.setFont(undefined, 'bold');
+    doc.text('Location:', 20, yPos);
+    doc.setFont(undefined, 'normal');
+    doc.text(`${report.issueLatitude.toFixed(6)}, ${report.issueLongitude.toFixed(6)}`, 70, yPos);
+    yPos += 6;
+    
+    if (report.hasGeoTag) {
+      doc.setTextColor(40, 167, 69);
+      doc.text('✓ Location verified from image EXIF data', 70, yPos);
+      doc.setTextColor(0, 0, 0);
+      yPos += 6;
+    }
+  }
+  
+  yPos += 5;
+  
+  // Citizen Engagement
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text('👥 CITIZEN ENGAGEMENT', 20, yPos);
+  yPos += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
+  addField('Total Votes', String(report.votes));
+  addField('Comments', String(report.comments.length));
+  addField('Escalated', report.escalated ? 'YES (High Priority)' : 'No', 
+    report.escalated ? [239, 68, 68] : [0, 0, 0]);
+  
+  yPos += 5;
+  
+  // Check if new page needed
+  if (yPos > 240) {
+    doc.addPage();
+    yPos = 20;
+  }
+  
+  // Fund Request Details
+  doc.setFillColor(102, 126, 234);
+  doc.rect(15, yPos - 5, 180, 10, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text('💰 FUND REQUEST DETAILS', 20, yPos + 2);
+  doc.setTextColor(0, 0, 0);
+  yPos += 15;
+  
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
+  
+  const fr = report.fundRequest;
+  addField('Estimated Amount', `₹${(fr.estimatedAmount || 0).toLocaleString('en-IN')}`, [16, 185, 129]);
+  addField('Requested By', fr.requestedByRole === 'worker' ? 'Municipal Worker' : 'Citizen');
+  addField('Request Date', new Date(fr.requestDate).toLocaleDateString('en-IN', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  }));
+  addField('Status', fr.status.toUpperCase(),
+    fr.status === 'approved' ? [16, 185, 129] :
+    fr.status === 'rejected' ? [239, 68, 68] : [245, 158, 11]);
+  
+  yPos += 5;
+  
+  // Justification
+  doc.setFont(undefined, 'bold');
+  doc.text('Justification:', 20, yPos);
+  yPos += 6;
+  
+  doc.setFont(undefined, 'normal');
+  doc.setFillColor(245, 245, 245);
+  doc.rect(20, yPos - 3, 170, 40, 'F');
+  const justificationLines = doc.splitTextToSize(fr.justification, 160);
+  doc.text(justificationLines, 25, yPos + 3);
+  yPos += 45;
+  
+  // Assignment Info
+  if (report.assignedTo) {
+    yPos += 5;
+    doc.setFont(undefined, 'bold');
+    doc.text('Assigned Worker:', 20, yPos);
+    doc.setFont(undefined, 'normal');
+    doc.text(report.assignedTo, 70, yPos);
+    yPos += 6;
+  }
+  
+  // Footer
+  doc.setFontSize(9);
+  doc.setTextColor(128, 128, 128);
+  const footerY = 280;
+  doc.text('Generated on: ' + new Date().toLocaleString('en-IN'), 20, footerY);
+  doc.text('Speak for the Streets - Civic Reporter Platform', 105, footerY + 5, { align: 'center' });
+  doc.setDrawColor(200, 200, 200);
+  doc.line(20, footerY - 5, 190, footerY - 5);
+  
+  // Save PDF
+  const filename = `Fund_Request_${report._id.substring(0, 8)}_${Date.now()}.pdf`;
+  doc.save(filename);
+  
+  alert(`✅ PDF generated successfully!\n\nFile: ${filename}\n\nYou can now:\n• Email this to municipal authorities\n• Print for official records\n• Archive for documentation`);
+}
+
+// ✅ IMPROVED: Email function with better formatting
+function emailMunicipal(reportId) {
+  const report = allRequests.find(r => r._id === reportId);
+  if (!report) return;
+  
+  const subject = encodeURIComponent(`[URGENT] Fund Release Request - ${report.title}`);
+  
+  const body = encodeURIComponent(`Dear Municipal Authority,
+
+This is an official fund release request for a high-priority civic issue.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 COMPLAINT DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Issue Title: ${report.title}
-Category: ${report.category}
-Status: ${report.status}
-
-ISSUE DETAILS:
-${report.description}
-
-LOCATION:
-${report.issueLatitude ? `Coordinates: ${report.issueLatitude}, ${report.issueLongitude}` : 'Location not available'}
-${report.hasGeoTag ? 'Location verified from image metadata' : ''}
-
-CITIZEN ENGAGEMENT:
-- Total Votes: ${report.votes}
-- Comments: ${report.comments.length}
-- Escalated: ${report.escalated ? 'Yes' : 'No'}
-
-FUND REQUEST DETAILS:
-- Estimated Amount: ₹${(report.fundRequest.estimatedAmount || 0).toLocaleString()}
-- Requested By: ${report.fundRequest.requestedByRole}
-- Request Date: ${new Date(report.fundRequest.requestDate).toLocaleString()}
-- Status: ${report.fundRequest.status.toUpperCase()}
-
-JUSTIFICATION:
-${report.fundRequest.justification}
-
-${report.assignedTo ? `ASSIGNED WORKER: ${report.assignedTo}` : 'Not yet assigned'}
-
-Generated on: ${new Date().toLocaleString()}
+Category: ${report.category.toUpperCase()}
+Current Status: ${report.status.toUpperCase()}
 Report ID: ${report._id}
 
-===========================================
-      `.trim();
-      
-      // Create downloadable text file (can be converted to PDF later)
-      const blob = new Blob([pdfContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `fund-request-${report._id}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      alert('📄 Report generated! You can convert this to PDF using any online converter or print to PDF.');
-    }
-    
-    function viewComplaint(reportId) {
-      window.open(`main.html#report-${reportId}`, '_blank');
-    }
-    
-    function emailMunicipal(reportId) {
-      const report = allRequests.find(r => r._id === reportId);
-      if (!report) return;
-      
-      const subject = encodeURIComponent(`Fund Release Request: ${report.title}`);
-      const body = encodeURIComponent(`
-Dear Municipal Authority,
+Description:
+${report.description}
 
-This is to request fund release for the following civic issue:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👥 CITIZEN ENGAGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Issue: ${report.title}
-Category: ${report.category}
-Estimated Amount: ₹${(report.fundRequest.estimatedAmount || 0).toLocaleString()}
+• ${report.votes} citizens have upvoted this issue
+• ${report.comments.length} comments/feedback received
+• Escalation Status: ${report.escalated ? 'HIGH PRIORITY' : 'Normal'}
 
-Citizen Engagement:
-- ${report.votes} citizens have upvoted this issue
-- ${report.comments.length} comments received
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 FUND REQUEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Estimated Amount Required: ₹${(report.fundRequest.estimatedAmount || 0).toLocaleString('en-IN')}
+Requested Date: ${new Date(report.fundRequest.requestDate).toLocaleDateString('en-IN')}
 
 Justification:
 ${report.fundRequest.justification}
 
-Location: ${report.issueLatitude ? `${report.issueLatitude}, ${report.issueLongitude}` : 'Available on platform'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Please review this request at your earliest convenience.
+${report.issueLatitude ? `Location Coordinates: ${report.issueLatitude.toFixed(6)}, ${report.issueLongitude.toFixed(6)}` : ''}
+${report.hasGeoTag ? '✓ Location verified from image metadata' : ''}
 
-Report ID: ${report._id}
+Please review this request at your earliest convenience. The affected citizens are counting on prompt action.
+
+You can view full details and images on the platform using Report ID: ${report._id}
+
+--
 Generated via Speak for the Streets Platform
-      `);
-      
-      window.location.href = `mailto:municipal@example.com?subject=${subject}&body=${body}`;
+Timestamp: ${new Date().toLocaleString('en-IN')}
+  `);
+  
+  // Open email client
+  window.location.href = `mailto:municipal@example.com?subject=${subject}&body=${body}`;
+  
+  // Also show a copy dialog
+  setTimeout(() => {
+    if (confirm('Would you also like to copy the request details to clipboard?\n\n(You can paste this into any email or document)')) {
+      const plainText = decodeURIComponent(body);
+      navigator.clipboard.writeText(plainText).then(() => {
+        alert('✅ Request details copied to clipboard!');
+      }).catch(err => {
+        alert('Could not copy to clipboard. Please use the email client that opened.');
+      });
     }
-    
+  }, 500);
+}
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
@@ -479,4 +626,5 @@ Generated via Speak for the Streets Platform
     loadFundRequests();
   </script>
 </body>
+
 </html>
