@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Requests - Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-card h3 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #667eea;
+    }
+    
+    .stat-card p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .filter-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+      background: white;
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .filter-tab.active {
+      background: #667eea;
+      color: white;
+    }
+    
+    .requests-container {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .request-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-left: 5px solid #667eea;
+    }
+    
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    
+    .request-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-approved { background: #d4edda; color: #155724; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    
+    .request-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .info-item {
+      font-size: 14px;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      color: #666;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .justification {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    
+    .btn-pdf {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-pdf:hover {
+      background: #c82333;
+    }
+    
+    .btn-view {
+      background: #007bff;
+      color: white;
+    }
+    
+    .btn-view:hover {
+      background: #0056b3;
+    }
+    
+    .btn-email {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-email:hover {
+      background: #218838;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    
+    .empty-state i {
+      font-size: 64px;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1><i class="fas fa-money-bill-wave"></i> Fund Release Requests</h1>
+    <p>Municipal Dashboard - Review and manage funding requests</p>
+  </div>
+  
+  <div class="stats" id="statsContainer"></div>
+  
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterRequests('all')">All</button>
+    <button class="filter-tab" onclick="filterRequests('pending')">Pending</button>
+    <button class="filter-tab" onclick="filterRequests('approved')">Approved</button>
+    <button class="filter-tab" onclick="filterRequests('rejected')">Rejected</button>
+  </div>
+  
+  <div class="requests-container" id="requestsContainer">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: #667eea;"></i>
+      <p>Loading fund requests...</p>
+    </div>
+  </div>
+  
+  <script>
+    let allRequests = [];
+    let currentFilter = 'all';
+    
+    async function loadFundRequests() {
+      try {
+        const response = await fetch('http://localhost:5000/fund-requests');
+        allRequests = await response.json();
+        
+        updateStats();
+        displayRequests();
+      } catch (error) {
+        console.error('Error loading fund requests:', error);
+        document.getElementById('requestsContainer').innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Failed to load fund requests</p>
+            <p style="font-size: 14px; margin-top: 10px;">Make sure the server is running on http://localhost:5000</p>
+          </div>
+        `;
+      }
+    }
+    
+    function updateStats() {
+      const stats = {
+        total: allRequests.length,
+        pending: allRequests.filter(r => r.fundRequest.status === 'pending').length,
+        approved: allRequests.filter(r => r.fundRequest.status === 'approved').length,
+        totalAmount: allRequests
+          .filter(r => r.fundRequest.status === 'pending')
+          .reduce((sum, r) => sum + (r.fundRequest.estimatedAmount || 0), 0)
+      };
+      
+      document.getElementById('statsContainer').innerHTML = `
+        <div class="stat-card">
+          <h3>${stats.total}</h3>
+          <p>Total Requests</p>
+        </div>
+        <div class="stat-card">
+          <h3>${stats.pending}</h3>
+          <p>Pending Review</p>
+        </div>
+        <div class="stat-card">
+          <h3>${stats.approved}</h3>
+          <p>Approved</p>
+        </div>
+        <div class="stat-card">
+          <h3>₹${stats.totalAmount.toLocaleString()}</h3>
+          <p>Pending Amount</p>
+        </div>
+      `;
+    }
+    
+    function filterRequests(filter) {
+      currentFilter = filter;
+      
+      // Update tab styles
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      displayRequests();
+    }
+    
+    function displayRequests() {
+      let filtered = allRequests;
+      
+      if (currentFilter !== 'all') {
+        filtered = allRequests.filter(r => r.fundRequest.status === currentFilter);
+      }
+      
+      const container = document.getElementById('requestsContainer');
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No ${currentFilter === 'all' ? '' : currentFilter} fund requests found</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = filtered.map(report => createRequestCard(report)).join('');
+    }
+    
+    function createRequestCard(report) {
+      const fr = report.fundRequest;
+      const statusClass = `status-${fr.status}`;
+      
+      return `
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-title">
+              ${escapeHtml(report.title)}
+            </div>
+            <span class="status-badge ${statusClass}">${fr.status}</span>
+          </div>
+          
+          <div class="request-info">
+            <div class="info-item">
+              <span class="info-label">Category</span>
+              ${report.category}
+            </div>
+            <div class="info-item">
+              <span class="info-label">Estimated Amount</span>
+              ₹${(fr.estimatedAmount || 0).toLocaleString()}
+            </div>
+            <div class="info-item">
+              <span class="info-label">Votes</span>
+              ${report.votes} upvotes
+            </div>
+            <div class="info-item">
+              <span class="info-label">Request Date</span>
+              ${new Date(fr.requestDate).toLocaleDateString()}
+            </div>
+            <div class="info-item">
+              <span class="info-label">Requested By</span>
+              ${fr.requestedByRole === 'worker' ? 'Worker' : 'Citizen'}
+            </div>
+            <div class="info-item">
+              <span class="info-label">Location</span>
+              ${report.issueLatitude ? `${report.issueLatitude.toFixed(4)}, ${report.issueLongitude.toFixed(4)}` : 'N/A'}
+            </div>
+          </div>
+          
+          <div class="justification">
+            <strong>Justification:</strong><br>
+            ${escapeHtml(fr.justification)}
+          </div>
+          
+          <div class="actions">
+            <button class="btn btn-pdf" onclick="generatePDF('${report._id}')">
+              <i class="fas fa-file-pdf"></i> Generate PDF Report
+            </button>
+            <button class="btn btn-view" onclick="viewComplaint('${report._id}')">
+              <i class="fas fa-eye"></i> View Full Details
+            </button>
+            <button class="btn btn-email" onclick="emailMunicipal('${report._id}')">
+              <i class="fas fa-envelope"></i> Email to Municipal Office
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    function generatePDF(reportId) {
+      const report = allRequests.find(r => r._id === reportId);
+      if (!report) return;
+      
+      // Create a formatted report document
+      const pdfContent = `
+===========================================
+FUND RELEASE REQUEST REPORT
+===========================================
+
+Issue Title: ${report.title}
+Category: ${report.category}
+Status: ${report.status}
+
+ISSUE DETAILS:
+${report.description}
+
+LOCATION:
+${report.issueLatitude ? `Coordinates: ${report.issueLatitude}, ${report.issueLongitude}` : 'Location not available'}
+${report.hasGeoTag ? 'Location verified from image metadata' : ''}
+
+CITIZEN ENGAGEMENT:
+- Total Votes: ${report.votes}
+- Comments: ${report.comments.length}
+- Escalated: ${report.escalated ? 'Yes' : 'No'}
+
+FUND REQUEST DETAILS:
+- Estimated Amount: ₹${(report.fundRequest.estimatedAmount || 0).toLocaleString()}
+- Requested By: ${report.fundRequest.requestedByRole}
+- Request Date: ${new Date(report.fundRequest.requestDate).toLocaleString()}
+- Status: ${report.fundRequest.status.toUpperCase()}
+
+JUSTIFICATION:
+${report.fundRequest.justification}
+
+${report.assignedTo ? `ASSIGNED WORKER: ${report.assignedTo}` : 'Not yet assigned'}
+
+Generated on: ${new Date().toLocaleString()}
+Report ID: ${report._id}
+
+===========================================
+      `.trim();
+      
+      // Create downloadable text file (can be converted to PDF later)
+      const blob = new Blob([pdfContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fund-request-${report._id}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      alert('📄 Report generated! You can convert this to PDF using any online converter or print to PDF.');
+    }
+    
+    function viewComplaint(reportId) {
+      window.open(`main.html#report-${reportId}`, '_blank');
+    }
+    
+    function emailMunicipal(reportId) {
+      const report = allRequests.find(r => r._id === reportId);
+      if (!report) return;
+      
+      const subject = encodeURIComponent(`Fund Release Request: ${report.title}`);
+      const body = encodeURIComponent(`
+Dear Municipal Authority,
+
+This is to request fund release for the following civic issue:
+
+Issue: ${report.title}
+Category: ${report.category}
+Estimated Amount: ₹${(report.fundRequest.estimatedAmount || 0).toLocaleString()}
+
+Citizen Engagement:
+- ${report.votes} citizens have upvoted this issue
+- ${report.comments.length} comments received
+
+Justification:
+${report.fundRequest.justification}
+
+Location: ${report.issueLatitude ? `${report.issueLatitude}, ${report.issueLongitude}` : 'Available on platform'}
+
+Please review this request at your earliest convenience.
+
+Report ID: ${report._id}
+Generated via Speak for the Streets Platform
+      `);
+      
+      window.location.href = `mailto:municipal@example.com?subject=${subject}&body=${body}`;
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Load requests on page load
+    loadFundRequests();
+  </script>
+</body>
+</html>
