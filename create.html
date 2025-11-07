@@ -133,7 +133,23 @@
         <div class="message" id="complaintMessage"></div>
       </form>
     </div>
-
+<!-- Issue Location Input (ADDED) -->
+<label for="issueLocation" id="labelIssueLocation">Issue Location (Optional)</label>
+<div style="background: #f0f2f5; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+  <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">
+    📍 If the issue location is different from your current location, provide coordinates:
+  </p>
+  <div style="display: flex; gap: 10px;">
+    <input type="number" id="issueLatitude" step="any" placeholder="Latitude (e.g., 18.5204)" 
+           style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+    <input type="number" id="issueLongitude" step="any" placeholder="Longitude (e.g., 73.8567)"
+           style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+  </div>
+  <button type="button" onclick="pickLocationOnMap()" 
+          style="margin-top: 8px; background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+    <i class="fas fa-map-marker-alt"></i> Pick from Map
+  </button>
+</div>
     <div id="reelTabContent" class="tab-content">
       <form id="createReelForm">
         <label for="reelTitle" id="labelReelTitle">Reel Title / Caption</label>
